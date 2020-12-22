@@ -1,0 +1,218 @@
+{
+  "id": 1638,
+  "name": "Test Profile",
+  "schedule": {
+    "playlists": [
+      {
+        "id": 288,
+        "name": "Цой Short",
+        "files": [
+          {
+            "id": 9499,
+            "file_name": "https://api-test-vision.cubicservice.ru/storage/temp/20201023_1343_1397.mp3",
+            "name": "Цой2.mp3",
+            "size": 537198,
+            "md5_file": "593a768e36523b6b2f38848ed3db1970",
+            "duration": 13400,
+            "order": 0
+          },
+          {
+            "id": 9498,
+            "file_name": "https://api-test-vision.cubicservice.ru/storage/temp/20201023_1343_8823.mp3",
+            "name": "Цой1.mp3",
+            "size": 451535,
+            "md5_file": "9319d3673f4b2a20ee0bc587b9cde5cb",
+            "duration": 11258,
+            "order": 1
+          },
+          {
+            "id": 9497,
+            "file_name": "https://api-test-vision.cubicservice.ru/storage/temp/20201023_1343_2743.mp3",
+            "name": "Цой4.mp3",
+            "size": 657362,
+            "md5_file": "9ae2b26b66af8b38c4edd2fb379589a6",
+            "duration": 16404,
+            "order": 2
+          },
+          {
+            "id": 9496,
+            "file_name": "https://api-test-vision.cubicservice.ru/storage/temp/20201023_1343_9536.mp3",
+            "name": "Цой3.mp3",
+            "size": 475551,
+            "md5_file": "af501fe7a4528ddb70f479147b2b32d3",
+            "duration": 11859,
+            "order": 3
+          }
+        ],
+        "duration": 52921,
+        "random": true       },
+      {
+        "id": 1632,
+        "name": "Земфира Short",
+        "files": [
+          {
+            "id": 9500,
+            "file_name": "https://api-test-vision.cubicservice.ru/storage/temp/20201023_1345_3953.mp3",
+            "name": "Земфира1 (mp3cut.net).mp3",
+            "size": 357327,
+            "md5_file": "f1236d7de7b3ff5be70afe571545a972",
+            "duration": 11128,
+            "order": 0
+          }
+        ],
+        "duration": 11128,
+        "random": true
+      },
+      {
+        "id": 1633,
+        "name": "Short Music",
+        "files": [
+          {
+            "id": 9495,
+            "file_name": "https://api-test-vision.cubicservice.ru/storage/temp/20201023_1316_4737.mp3",
+            "name": "Звери - До Скорой Встречи (mp3cut.net).mp3",
+            "size": 728415,
+            "md5_file": "af339b2ba212baeb911857ac95f63817",
+            "duration": 18181,
+            "order": 0
+          },
+          {
+            "id": 9494,
+            "file_name": "https://api-test-vision.cubicservice.ru/storage/temp/20201023_1316_8419.mp3",
+            "name": "Звери - Дожди-пистолеты (mp3cut.net).mp3",
+            "size": 501669,
+            "md5_file": "273766cbd3e0b6ec3877616866cece6e",
+            "duration": 12512,
+            "order": 1
+          },
+          {
+            "id": 9493,
+            "file_name": "https://api-test-vision.cubicservice.ru/storage/temp/20201023_1316_1163.mp3",
+            "name": "Звери - Просто Такая Сильная Любовь (mp3cut.net).mp3",
+            "size": 616629,
+            "md5_file": "36e94503c695dca46e85074abfbfbd3a",
+            "duration": 15386,
+            "order": 2
+          },
+          {
+            "id": 9492,
+            "file_name": "https://api-test-vision.cubicservice.ru/storage/temp/20201023_1316_5426.mp3",
+            "name": "Звери - Напитки Покрепче (mp3cut.net).mp3",
+            "size": 746177,
+            "md5_file": "ebc934851804bc32d1ba881a9172f7ea",
+            "duration": 18625,
+            "order": 3
+          }
+        ],
+        "duration": 64704,
+        "random": true
+      }
+    ],
+    "days": [
+      {
+        "day": "monday",
+        "timeZones": [
+          {
+            "from": "6:15",
+
+            "to": "22:15",
+
+            "playlists": [
+              {
+                "playlist_id": 288,
+                "proportion": 1
+
+              }
+            ]
+
+          }
+        ]
+      },
+      {
+        "day": "tuesday",
+        "timeZones": []
+      },
+      {
+        "day": "wednesday",
+        "timeZones": [
+          {
+            "from": "6:30",
+            "to": "16:30",
+            "playlists": [
+              {
+                "playlist_id": 1632,
+                "proportion": 1
+              },
+              {
+                "playlist_id": 288,
+                "proportion": 3
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "day": "thursday",
+        "timeZones": [
+          {
+            "from": "7:45",
+            "to": "13:45",
+            "playlists": [
+              {
+                "playlist_id": 1633,
+                "proportion": 1
+              }
+            ]
+          },
+          {
+            "from": "13:45",
+            "to": "17:15",
+            "playlists": [
+              {
+                "playlist_id": 288,
+                "proportion": 1
+              },
+              {
+                "playlist_id": 1633,
+                "proportion": 1
+              }
+            ]
+          },
+          {
+            "from": "17:15",
+            "to": "19:30",
+            "playlists": [
+              {
+                "playlist_id": 288,
+                "proportion": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "day": "friday",
+        "timeZones": [
+          {
+            "from": "1:45",
+            "to": "16:45",
+            "playlists": [
+              {
+                "playlist_id": 1632,
+                "proportion": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "day": "saturday",
+        "timeZones": []
+      },
+      {
+        "day": "sunday",
+        "timeZones": []
+      }
+    ]
+  }
+}
