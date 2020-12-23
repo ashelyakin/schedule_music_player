@@ -1,38 +1,35 @@
 package com.ashelyakin.schedulemusicplayer
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Context
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
+import com.ashelyakin.schedulemusicplayer.download.dialogFragment.InetUnavailableDialogFragment
+import com.ashelyakin.schedulemusicplayer.download.dialogFragment.LoadFinishDialogFragment
+import com.ashelyakin.schedulemusicplayer.download.dialogFragment.LoadStartDialogFragment
+import com.ashelyakin.schedulemusicplayer.download.DownloadCallbacks
+import com.ashelyakin.schedulemusicplayer.download.DownloadViewModel
+import com.ashelyakin.schedulemusicplayer.download.Downloader
+import com.ashelyakin.schedulemusicplayer.profile.Profile
 import com.ashelyakin.schedulemusicplayer.profile.ProfileLoader
 import com.ashelyakin.schedulemusicplayer.profile.Schedule
 
+
 class MainActivity : AppCompatActivity() {
 
-    init {
-        val profile = ProfileLoader.getProfileFromJson(this, "testWithoutComments.json")
+    private lateinit var viewModel: DownloadViewModel
+    private lateinit var profile: Profile
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        viewModel = ViewModelProvider(this).get(DownloadViewModel::class.java)
+
+        profile = ProfileLoader.getProfileFromJson(this, "testWithoutComments.json")
+        title = profile.name
         initPlaylistData(profile.schedule)
-        downloadMp3()
-    }
-
-    private fun downloadMp3() {
-        val downloader = Downloader(object :DownloadCallbacks{
-            override fun onLoadStart() {
-                TODO("Not yet implemented")
-            }
-
-            override fun onProgressChanged() {
-                TODO("Not yet implemented")
-            }
-
-            override fun onLoadFinished() {
-                TODO("Not yet implemented")
-            }
-
-            override fun onLoadStopped() {
-                TODO("Not yet implemented")
-            }
-
-        })
-        downloader.downloadMp3(this)
+        downloadMp3(this)
     }
 
     private fun initPlaylistData(schedule: Schedule) {
@@ -40,8 +37,45 @@ class MainActivity : AppCompatActivity() {
             PlaylistsData.setPlaylistsData(playlist.id, playlist)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+    private fun downloadMp3(context: Context) {
+        val downloader =
+            Downloader(object :
+                DownloadCallbacks {
+
+                val loadStartDialogFragment = LoadStartDialogFragment()
+                val inetUnavailableDialogFragment = InetUnavailableDialogFragment()
+                val loadFinishDialogFragment = LoadFinishDialogFragment()
+
+                override fun onLoadStart() {
+                    loadStartDialogFragment.show(supportFragmentManager, "loadStartDialog")
+                }
+
+                override fun onProgressChanged(newProgress: Int) {
+                    viewModel.progress.postValue(newProgress)
+                }
+
+                override fun onLoadFinished() {
+                    loadStartDialogFragment.dismiss()
+                    loadFinishDialogFragment.show(supportFragmentManager, "loadFinishDialog")
+                    /*main_recyclerView.adapter = RecyclerAdapter(profile.schedule)
+                    main_recyclerView.layoutManager = LinearLayoutManager(context)*/
+                }
+
+
+                override fun onLoadStopped() {
+                    inetUnavailableDialogFragment.isCancelable = false
+                    inetUnavailableDialogFragment.show(
+                        supportFragmentManager,
+                        "inetUnavailableDialogFragment"
+                    )
+                }
+
+                override fun onLoadResume() {
+                    inetUnavailableDialogFragment.dismiss()
+                }
+
+            })
+        downloader.downloadMp3(this)
     }
+
 }

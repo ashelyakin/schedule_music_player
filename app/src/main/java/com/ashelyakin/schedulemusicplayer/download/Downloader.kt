@@ -1,6 +1,7 @@
-package com.ashelyakin.schedulemusicplayer
+package com.ashelyakin.schedulemusicplayer.download
 
 import android.content.Context
+import com.ashelyakin.schedulemusicplayer.PlaylistsData
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.File
@@ -13,19 +14,36 @@ class Downloader(private val callbacks: DownloadCallbacks) {
     fun downloadMp3(context: Context) {
         GlobalScope.launch {
             callbacks.onLoadStart()
-            for (musicFile in PlaylistsData.getPlaylistsData().flatMap { it.files }) {
-                while (!isInternetAvailable()) {
-                    callbacks.onLoadStopped()
-                    Thread.sleep(2000)
-                }
-                callbacks.onLoadStart()
-                val musicFileAbsolutePath =
-                    context.filesDir.absolutePath + "/" + musicFile.id + ".mp3"
+
+            val fileList = PlaylistsData.getPlaylistsData()
+                .flatMap { it.files }
+            var progress = 0
+            val step = 100/fileList.size
+
+            for (musicFile in fileList) {
+                ifInetIsUnavailable()
+
+                val musicFileAbsolutePath = context.filesDir.absolutePath + "/" + musicFile.id + ".mp3"
                 getMp3FromURL(musicFile.fileName, musicFileAbsolutePath)
-                callbacks.onProgressChanged()
+
+                progress += step
+                callbacks.onProgressChanged(progress)
             }
             callbacks.onLoadFinished()
         }
+    }
+
+    private fun ifInetIsUnavailable() {
+        var isResumed = false
+        while (!isInternetAvailable()) {
+            if (!isResumed) {
+                callbacks.onLoadStopped()
+                isResumed = true
+            }
+            Thread.sleep(2000)
+        }
+        if (isResumed)
+            callbacks.onLoadResume()
     }
 
     private fun isInternetAvailable(): Boolean {
@@ -38,7 +56,6 @@ class Downloader(private val callbacks: DownloadCallbacks) {
     }
 
     private fun getMp3FromURL(url_path: String, fileAbsolutePath: String) {
-
         try {
             val url = URL(url_path)
             val httpURLConnection = url.openConnection() as HttpURLConnection
