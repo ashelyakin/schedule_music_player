@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.ashelyakin.schedulemusicplayer.download.dialogFragment.InetUnavailableDialogFragment
 import com.ashelyakin.schedulemusicplayer.download.dialogFragment.LoadFinishDialogFragment
 import com.ashelyakin.schedulemusicplayer.download.dialogFragment.LoadStartDialogFragment
@@ -13,6 +14,8 @@ import com.ashelyakin.schedulemusicplayer.download.Downloader
 import com.ashelyakin.schedulemusicplayer.profile.Profile
 import com.ashelyakin.schedulemusicplayer.profile.ProfileLoader
 import com.ashelyakin.schedulemusicplayer.profile.Schedule
+import com.ashelyakin.schedulemusicplayer.recyclerView.RecyclerAdapter
+import kotlinx.android.synthetic.main.activity_main.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -57,8 +60,8 @@ class MainActivity : AppCompatActivity() {
                 override fun onLoadFinished() {
                     loadStartDialogFragment.dismiss()
                     loadFinishDialogFragment.show(supportFragmentManager, "loadFinishDialog")
-                    /*main_recyclerView.adapter = RecyclerAdapter(profile.schedule)
-                    main_recyclerView.layoutManager = LinearLayoutManager(context)*/
+                    main_recyclerView.adapter = RecyclerAdapter(profile.schedule)
+                    main_recyclerView.layoutManager = LinearLayoutManager(context)
                 }
 
 
