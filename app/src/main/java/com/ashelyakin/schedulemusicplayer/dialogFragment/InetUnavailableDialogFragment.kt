@@ -1,4 +1,4 @@
-package com.ashelyakin.schedulemusicplayer.download.dialogFragment
+package com.ashelyakin.schedulemusicplayer.dialogFragment
 
 import android.app.Dialog
 import android.os.Bundle

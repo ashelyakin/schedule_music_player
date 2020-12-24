@@ -49,7 +49,7 @@ data class TimeZonePlaylist (
     @Json(name = "playlist_id")
     val playlistID: Int,
 
-    val proportion: Int
+    var proportion: Int
 ): Parcelable
 
 @Parcelize

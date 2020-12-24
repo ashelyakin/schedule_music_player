@@ -1,15 +1,21 @@
 package com.ashelyakin.schedulemusicplayer.recyclerView
 
+import android.app.Activity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModelStoreOwner
 import androidx.recyclerview.widget.RecyclerView
+import com.ashelyakin.schedulemusicplayer.MainActivity
 import com.ashelyakin.schedulemusicplayer.R
 import com.ashelyakin.schedulemusicplayer.util.TimezoneUtil
 import com.ashelyakin.schedulemusicplayer.profile.*
 
 
-class RecyclerAdapter(private val schedule: Schedule): RecyclerView.Adapter<RecyclerHolder>(){
+class RecyclerAdapter(schedule: Schedule, private val timezonePlaylistsData: MutableLiveData<HashMap<Int, TimeZonePlaylist>>,
+                      private val owner: LifecycleOwner): RecyclerView.Adapter<RecyclerHolder>(){
 
     //список элементов для recyclerview, состоящий из списоков дней, таймзон и плейлистов, преобразованных в одномерную форму
     private val items = ArrayList<Pair<Any, ItemType>>()
@@ -37,7 +43,7 @@ class RecyclerAdapter(private val schedule: Schedule): RecyclerView.Adapter<Recy
             ItemType.TIMEZONE.ordinal -> v =inflateItemByType(parent, R.layout.timezone)
             ItemType.PLAYLIST.ordinal -> v = inflateItemByType(parent, R.layout.playlist)
         }
-        return RecyclerHolder(v, schedule.playlists as ArrayList<SchedulePlaylist>)
+        return RecyclerHolder(v, timezonePlaylistsData, owner)
     }
 
     private fun inflateItemByType(parent: ViewGroup, layout: Int): View {

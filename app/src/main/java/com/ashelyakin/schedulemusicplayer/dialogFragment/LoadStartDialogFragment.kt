@@ -1,4 +1,4 @@
-package com.ashelyakin.schedulemusicplayer.download.dialogFragment
+package com.ashelyakin.schedulemusicplayer.dialogFragment
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -16,18 +16,8 @@ import kotlinx.android.synthetic.main.load_start_dialog.*
 class LoadStartDialogFragment: DialogFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        dialog?.setTitle("Загрузка mp3 файлов!")
+        dialog?.setTitle("Загрузка mp3 файлов")
         val viewModel = ViewModelProvider(activity ?: this).get(DownloadViewModel::class.java)
-        /*viewModel.progress.observe(viewLifecycleOwner, Observer<Int> { newProgress ->
-            progress_bar.progress = newProgress
-            if (newProgress == 0) {
-                progress_bar.secondaryProgress = 0
-            } else {
-                progress_bar.secondaryProgress = newProgress + 5
-            }
-            progress_text.text = "$newProgress%"
-        })*/
-
         viewModel.progress.observe(viewLifecycleOwner, ProgressObserver())
 
         return inflater.inflate(R.layout.load_start_dialog, container, false)

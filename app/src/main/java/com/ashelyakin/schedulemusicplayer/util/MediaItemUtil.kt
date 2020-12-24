@@ -1,5 +1,6 @@
-package com.ashelyakin.schedulemusicplayer.util
 
+package com.ashelyakin.schedulemusicplayer.util
+/*
 import android.app.Activity
 import android.net.Uri
 import com.ashelyakin.schedulemusicplayer.MediaItems
@@ -163,4 +164,4 @@ class MediaItemUtil {
         }
 
     }
-}
+}*/

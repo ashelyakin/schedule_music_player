@@ -1,7 +1,7 @@
 package com.ashelyakin.schedulemusicplayer.download
 
 import android.content.Context
-import com.ashelyakin.schedulemusicplayer.PlaylistsData
+import com.ashelyakin.schedulemusicplayer.SchedulePlaylistsData
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.File
@@ -15,7 +15,7 @@ class Downloader(private val callbacks: DownloadCallbacks) {
         GlobalScope.launch {
             callbacks.onLoadStart()
 
-            val fileList = PlaylistsData.getPlaylistsData()
+            val fileList = SchedulePlaylistsData.getPlaylistsData()
                 .flatMap { it.files }
             var progress = 0
             val step = 100/fileList.size

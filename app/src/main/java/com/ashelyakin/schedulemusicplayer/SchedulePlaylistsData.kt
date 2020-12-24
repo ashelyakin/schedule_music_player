@@ -2,7 +2,7 @@ package com.ashelyakin.schedulemusicplayer
 
 import com.ashelyakin.schedulemusicplayer.profile.SchedulePlaylist
 
-object PlaylistsData {
+object SchedulePlaylistsData {
 
     private val playlistsData = HashMap<Int, SchedulePlaylist>()
 
