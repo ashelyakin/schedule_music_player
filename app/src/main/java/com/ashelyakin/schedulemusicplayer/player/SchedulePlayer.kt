@@ -2,9 +2,7 @@ package com.ashelyakin.schedulemusicplayer.player
 
 import android.app.Activity
 import androidx.lifecycle.ViewModelProvider
-import com.ashelyakin.schedulemusicplayer.download.DownloadViewModel
-import com.ashelyakin.schedulemusicplayer.profile.*
-import com.ashelyakin.schedulemusicplayer.util.MediaItemUtil
+import com.ashelyakin.schedulemusicplayer.profile.Schedule
 import com.ashelyakin.schedulemusicplayer.util.TimezoneUtil
 import com.google.android.exoplayer2.SimpleExoPlayer
 import java.util.*
@@ -21,9 +19,11 @@ class SchedulePlayer(private val activity: Activity, private val schedule: Sched
     //класс задачи по подготовке плеера, в соответствии с текущим временем при ручном запуске
     inner class PlayTimerTask: TimerTask(){
         override fun run() {
-            playerViewModel = ViewModelProvider(activity).get(PlayerViewModel::class.java)
+            val playerViewModelFactory = PlayerViewModelFactory(profile.schedule)
+            playerViewModel = ViewModelProvider(activity, playerViewModelFactory)
+                    .get(PlayerViewModel::class.java)
 
-            playerViewModel.addMediaItemsToPlayer(activity, player, null)
+            playerViewModel.addMediaItemsToPlayer()
             activity.runOnUiThread {
                 player.prepare()
             }

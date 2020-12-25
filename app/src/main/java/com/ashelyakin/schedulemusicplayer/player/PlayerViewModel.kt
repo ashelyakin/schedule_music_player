@@ -13,7 +13,7 @@ class PlayerViewModel(): ViewModel() {
     var lastAddedMediaItemFromCurrentPlaylist = MutableLiveData<MediaItem>()
 
     init {
-        addMediaItemsToPlayer
+        addMediaItemsToPlayer()
     }
 
 }
