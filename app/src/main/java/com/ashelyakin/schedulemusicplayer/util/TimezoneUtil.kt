@@ -15,7 +15,24 @@ class TimezoneUtil {
 
     companion object{
 
-        fun getNextTodayTimezone(timeZones: List<com.ashelyakin.schedulemusicplayer.profile.TimeZone>, timezone: TimeZone): Date? {
+        fun getNextTimezone(days: List<Day>): Date? {
+            val currentTime = LocalDateTime.now().toLocalTime()
+            var nextTodayTimezone: TimeZone? = null
+            for(timezone in days[LocalDate.now().dayOfWeek.ordinal].timeZones){
+                if (currentTime.isAfter(LocalTime.parse(transformToIsoTime(timezone.from), DateTimeFormatter.ISO_TIME))) {
+                    nextTodayTimezone = timezone
+                    break
+                }
+            }
+            return if (nextTodayTimezone != null)
+                getDate(nextTodayTimezone.from, 0)
+            else{
+                val nextDayTimeZone = TimezoneUtil.getNextDayFirstTimezone(days, LocalDate.now().dayOfWeek.ordinal)
+                nextDayTimeZone
+            }
+        }
+
+        /*fun getNextTodayTimezoneDate(timeZones: List<com.ashelyakin.schedulemusicplayer.profile.TimeZone>, timezone: TimeZone): Date? {
             val timezoneStartTime = LocalTime.parse(transformToIsoTime(timezone.from), DateTimeFormatter.ISO_TIME)
             val currentTime = LocalDateTime.now().toLocalTime()
 
@@ -23,7 +40,7 @@ class TimezoneUtil {
                 getDate(timezone.from, 0)
             else
                 null
-        }
+        }*/
 
         //счетчик рассмотренных дней для рекурсии
         private var observedDayCount = 1
@@ -83,6 +100,7 @@ class TimezoneUtil {
                 return "0$time"
             return time
         }
+
 
         private class TimeZoneComparator: Comparator<TimeZone>{
 

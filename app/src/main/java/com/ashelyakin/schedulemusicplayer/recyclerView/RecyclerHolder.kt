@@ -39,9 +39,9 @@ class RecyclerHolder(view: View, private val timezonePlaylistsData: MutableLiveD
     private fun bindPlaylist(timeZonePlaylist: TimeZonePlaylist){
         val schedulePlaylist = SchedulePlaylistsData.getPlaylistsData(timeZonePlaylist.playlistID)
         itemView.playlist_name.text = schedulePlaylist?.name
-        itemView.proportion.tag = timeZonePlaylist.hashCode()
+        itemView.proportion.tag = timeZonePlaylist.playlistID
         timezonePlaylistsData.observe(owner, Observer {
-            itemView.proportion.text = it[timeZonePlaylist.hashCode()]?.proportion.toString()
+            itemView.proportion.text = it[timeZonePlaylist.playlistID]?.proportion.toString()
         })
 
         //отображаем предупреждение о нецелостности плейлиста

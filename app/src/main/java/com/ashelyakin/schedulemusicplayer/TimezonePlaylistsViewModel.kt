@@ -13,7 +13,7 @@ class TimezonePlaylistsViewModel(schedule: Schedule): ViewModel() {
         timezonePlaylistsData.value = HashMap()
         for (timezonePlaylist in schedule.days.flatMap { it.timeZones.flatMap { it.playlists } })
         {
-            timezonePlaylistsData.value?.set(timezonePlaylist.hashCode(), timezonePlaylist)
+            timezonePlaylistsData.value?.set(timezonePlaylist.playlistID, timezonePlaylist)
         }
     }
 

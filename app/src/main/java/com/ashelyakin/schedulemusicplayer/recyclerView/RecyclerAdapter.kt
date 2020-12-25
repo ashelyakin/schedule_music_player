@@ -1,17 +1,16 @@
 package com.ashelyakin.schedulemusicplayer.recyclerView
 
-import android.app.Activity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModelStoreOwner
 import androidx.recyclerview.widget.RecyclerView
-import com.ashelyakin.schedulemusicplayer.MainActivity
 import com.ashelyakin.schedulemusicplayer.R
+import com.ashelyakin.schedulemusicplayer.profile.Schedule
+import com.ashelyakin.schedulemusicplayer.profile.TimeZone
+import com.ashelyakin.schedulemusicplayer.profile.TimeZonePlaylist
 import com.ashelyakin.schedulemusicplayer.util.TimezoneUtil
-import com.ashelyakin.schedulemusicplayer.profile.*
 
 
 class RecyclerAdapter(schedule: Schedule, private val timezonePlaylistsData: MutableLiveData<HashMap<Int, TimeZonePlaylist>>,

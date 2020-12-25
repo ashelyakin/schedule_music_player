@@ -1,7 +1,10 @@
 package com.ashelyakin.schedulemusicplayer
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
@@ -20,6 +23,7 @@ import com.ashelyakin.schedulemusicplayer.profile.ProfileLoader
 import com.ashelyakin.schedulemusicplayer.profile.Schedule
 import com.ashelyakin.schedulemusicplayer.recyclerView.RecyclerAdapter
 import kotlinx.android.synthetic.main.activity_main.*
+import java.util.concurrent.atomic.AtomicInteger
 
 
 class MainActivity : AppCompatActivity() {
@@ -34,7 +38,7 @@ class MainActivity : AppCompatActivity() {
 
         profile = ProfileLoader.getProfileFromJson(this, "testWithoutComments.json")
         title = profile.name
-        initPlaylistData(profile.schedule)
+        initPlaylistDataAndSetId(profile.schedule)
 
         downloadViewModel = ViewModelProvider(this).get(DownloadViewModel::class.java)
 
@@ -42,14 +46,45 @@ class MainActivity : AppCompatActivity() {
         timezonePlaylistsViewModel = ViewModelProvider(this, timezonePlaylistsViewModelFactory)
                 .get(TimezonePlaylistsViewModel::class.java)
 
-
         downloadMp3()
     }
 
-    private fun initPlaylistData(schedule: Schedule) {
-        for(playlist in schedule.playlists) {
-            SchedulePlaylistsData.setPlaylistsData(playlist.id, playlist)
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.main_activity_menu,menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId){
+            R.id.action_playback ->{
+                val i = Intent(this, PlaybackActivity::class.java)
+                i.putExtra("schedule", profile.schedule)
+                startActivity(i)
+                return true
+            }
         }
+        return super.onOptionsItemSelected(item)
+    }
+
+    fun btnProportionPlusClick(view: View){
+        val proportionView = getProportionView(view)
+        timezonePlaylistsViewModel.plusProportion(proportionView.tag as Int)
+    }
+
+    fun btnProportionMinusClick(view: View){
+        val proportionView = getProportionView(view)
+        timezonePlaylistsViewModel.minusProportion(proportionView.tag as Int)
+    }
+
+    var uuid = AtomicInteger(0)
+    private fun initPlaylistDataAndSetId(schedule: Schedule) {
+        for (day in schedule.days)
+            for (timezone in day.timeZones)
+                for (playlist in timezone.playlists){
+                    val newID = uuid.getAndIncrement()
+                    SchedulePlaylistsData.setPlaylistsData(newID, schedule.playlists.filter { it.id == playlist.playlistID }[0])
+                    playlist.playlistID = newID
+                }
     }
 
     private fun downloadMp3() {
@@ -98,16 +133,6 @@ class MainActivity : AppCompatActivity() {
             main_recyclerView.adapter = RecyclerAdapter(profile.schedule, timezonePlaylistsViewModel.timezonePlaylistsData, this)
             main_recyclerView.layoutManager = LinearLayoutManager(this)
         }
-    }
-
-    fun btnProportionPlusClick(view: View){
-        val proportionView = getProportionView(view)
-        timezonePlaylistsViewModel.plusProportion(proportionView.tag as Int)
-    }
-
-    fun btnProportionMinusClick(view: View){
-        val proportionView = getProportionView(view)
-        timezonePlaylistsViewModel.minusProportion(proportionView.tag as Int)
     }
 
     private fun getProportionView(view: View): TextView {

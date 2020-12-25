@@ -1,11 +1,8 @@
 
 package com.ashelyakin.schedulemusicplayer.util
-/*
+
 import android.app.Activity
 import android.net.Uri
-import com.ashelyakin.schedulemusicplayer.MediaItems
-import com.ashelyakin.schedulemusicplayer.PlaylistsPlayingPositions
-import com.ashelyakin.schedulemusicplayer.Proportions
 import com.ashelyakin.schedulemusicplayer.profile.Schedule
 import com.ashelyakin.schedulemusicplayer.profile.SchedulePlaylist
 import com.ashelyakin.schedulemusicplayer.profile.TimeZone
@@ -19,7 +16,7 @@ import kotlin.collections.ArrayList
 
 class MediaItemUtil {
 
-    companion object {
+    /*companion object {
 
         //добавляет трек в плеер, учитывая проприи плейлистов и перемешивание/сортировку
         fun addMediaItemToPlayer(activity: Activity, player: SimpleExoPlayer, schedule: Schedule, currentTrack: MediaItem?) {
@@ -163,5 +160,5 @@ class MediaItemUtil {
             return res!!
         }
 
-    }
-}*/
+    }*/
+}

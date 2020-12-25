@@ -10,11 +10,7 @@ class ProfileLoader {
     companion object {
 
         fun getProfileFromJson(context: Context, jsonFileName: String): Profile {
-            return parseJson(context, jsonFileName)
-        }
-
-        private fun parseJson(context: Context, fileName: String): Profile {
-            val json = getJsonDataFromAsset(context, fileName)
+            val json = getJsonDataFromAsset(context, jsonFileName)
             if (json == null) {
                 Log.e("ProfileLoader", "Error loading json")
                 exitProcess(0)
