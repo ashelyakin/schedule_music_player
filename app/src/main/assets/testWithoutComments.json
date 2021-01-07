@@ -130,14 +130,29 @@
       },
       {
         "day": "tuesday",
-        "timeZones": []
+        "timeZones": [
+          {
+            "from": "6:30",
+            "to": "22:30",
+            "playlists": [
+              {
+                "playlist_id": 1632,
+                "proportion": 1
+              },
+              {
+                "playlist_id": 288,
+                "proportion": 3
+              }
+            ]
+          }
+        ]
       },
       {
         "day": "wednesday",
         "timeZones": [
           {
             "from": "6:30",
-            "to": "16:30",
+            "to": "23:30",
             "playlists": [
               {
                 "playlist_id": 1632,
@@ -156,7 +171,7 @@
         "timeZones": [
           {
             "from": "7:45",
-            "to": "13:45",
+            "to": "11:45",
             "playlists": [
               {
                 "playlist_id": 1633,
@@ -165,12 +180,12 @@
             ]
           },
           {
-            "from": "13:45",
+            "from": "12:45",
             "to": "17:15",
             "playlists": [
               {
                 "playlist_id": 288,
-                "proportion": 1
+                "proportion": 2
               },
               {
                 "playlist_id": 1633,

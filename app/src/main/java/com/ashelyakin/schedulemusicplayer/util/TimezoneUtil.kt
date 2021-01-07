@@ -19,7 +19,7 @@ class TimezoneUtil {
             val currentTime = LocalDateTime.now().toLocalTime()
             var nextTodayTimezone: TimeZone? = null
             for(timezone in days[LocalDate.now().dayOfWeek.ordinal].timeZones){
-                if (currentTime.isAfter(LocalTime.parse(transformToIsoTime(timezone.from), DateTimeFormatter.ISO_TIME))) {
+                if (currentTime.isBefore(LocalTime.parse(transformToIsoTime(timezone.from), DateTimeFormatter.ISO_TIME))) {
                     nextTodayTimezone = timezone
                     break
                 }
