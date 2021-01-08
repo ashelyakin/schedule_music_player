@@ -1,4 +1,4 @@
-package com.ashelyakin.schedulemusicplayer
+package com.ashelyakin.schedulemusicplayer.activity
 
 import android.os.Bundle
 import android.util.Log
@@ -7,10 +7,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
-import com.ashelyakin.schedulemusicplayer.player.ExoPlayerListener
-import com.ashelyakin.schedulemusicplayer.player.PlayerViewModel
-import com.ashelyakin.schedulemusicplayer.player.PlayerViewModelFactory
+import com.ashelyakin.schedulemusicplayer.R
 import com.ashelyakin.schedulemusicplayer.player.SchedulePlayer
 import com.ashelyakin.schedulemusicplayer.profile.Schedule
 import com.google.android.exoplayer2.Player

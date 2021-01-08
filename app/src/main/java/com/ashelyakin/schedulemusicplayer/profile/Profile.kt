@@ -56,7 +56,7 @@ data class TimeZonePlaylist (
 data class SchedulePlaylist (
     val id: Int,
     val name: String,
-    val files: List<File>,
+    var files: List<File>,
     val duration: Int,
     val random: Boolean
 ): Parcelable

@@ -30,7 +30,6 @@ class TimezonePlaylistsViewModel(schedule: Schedule): ViewModel() {
     }
 
     private fun setProportion(id: Int, type: ProportionBtnClickType ){
-        //timezonePlaylistsData.value?.get(id)?.proportion = timezonePlaylistsData.value?.get(id)?.proportion?.plus(1)!!
         val timezonePlaylist = timezonePlaylistsData.value?.get(id)
         val currentProportion = timezonePlaylist?.proportion!!
         if (type == ProportionBtnClickType.PLUS)
@@ -40,6 +39,5 @@ class TimezonePlaylistsViewModel(schedule: Schedule): ViewModel() {
         val newTimezonePlaylistsData = HashMap(timezonePlaylistsData.value)
         newTimezonePlaylistsData[id] = timezonePlaylist
         timezonePlaylistsData.postValue(newTimezonePlaylistsData)
-        //timezonePlaylistsData.value?.set(id, timezonePlaylist)
     }
 }

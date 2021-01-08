@@ -6,7 +6,7 @@ import androidx.lifecycle.Observer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 
-class ExoPlayerListener(private val lifecycleOwner: LifecycleOwner, private val playerViewModel: PlayerViewModel): Player.EventListener{
+class ExoPlayerListener(private val playerViewModel: PlayerViewModel): Player.EventListener{
 
 
     override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
@@ -15,9 +15,7 @@ class ExoPlayerListener(private val lifecycleOwner: LifecycleOwner, private val 
         if (mediaItem == null)
             return
 
-        playerViewModel.currentPlaylist.observe(lifecycleOwner, Observer {
-            playerViewModel.fillView(mediaItem)
-        })
+        playerViewModel.fillView(mediaItem)
         playerViewModel.checkSwitchingPlaylistAndAddTracks(mediaItem)
     }
 

@@ -37,14 +37,12 @@ class PlayerViewModel(private val activity: Activity, private val player: Simple
                 playlistsPosition[playlist.playlistID] = -1
             }
 
-            //TODO перенести добавление listener playbackActivity, получать viewModel в ExoPlayerListener
-            player.addListener(ExoPlayerListener(activity as LifecycleOwner, this))
+            //TODO перенести добавление listener в playbackActivity, получать viewModel в ExoPlayerListener
+            player.addListener(ExoPlayerListener(this))
             addMediaItemsToPlayer()
         }
     }
-
-
-    //TODO shuffling
+    
     private fun addMediaItemsToPlayer() {
         Log.i(TAG, "adding mediaItems to player")
 

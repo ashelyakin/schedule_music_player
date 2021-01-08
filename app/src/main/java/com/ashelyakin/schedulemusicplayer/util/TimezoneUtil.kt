@@ -32,19 +32,9 @@ class TimezoneUtil {
             }
         }
 
-        /*fun getNextTodayTimezoneDate(timeZones: List<com.ashelyakin.schedulemusicplayer.profile.TimeZone>, timezone: TimeZone): Date? {
-            val timezoneStartTime = LocalTime.parse(transformToIsoTime(timezone.from), DateTimeFormatter.ISO_TIME)
-            val currentTime = LocalDateTime.now().toLocalTime()
-
-            return if (currentTime.isBefore(timezoneStartTime))
-                getDate(timezone.from, 0)
-            else
-                null
-        }*/
-
         //счетчик рассмотренных дней для рекурсии
         private var observedDayCount = 1
-        fun getNextDayFirstTimezone(days: List<Day>, today: Int): Date? {
+        private fun getNextDayFirstTimezone(days: List<Day>, today: Int): Date? {
 
             //если в расписании нет ни одной timezone, то после рассмотрения 7 дней - выход из рекурсии
             if (++observedDayCount > 7)
@@ -71,7 +61,7 @@ class TimezoneUtil {
             return null
         }
 
-        fun isCurrentTimeInTimezone(from: String, to: String): Boolean {
+        private fun isCurrentTimeInTimezone(from: String, to: String): Boolean {
             val timezoneStartTime = LocalTime.parse(transformToIsoTime(from), DateTimeFormatter.ISO_TIME)
             val timezoneFinishTime = LocalTime.parse(transformToIsoTime(to), DateTimeFormatter.ISO_TIME)
             val currentTime = LocalDateTime.now().toLocalTime()

@@ -209,12 +209,16 @@
         "day": "friday",
         "timeZones": [
           {
-            "from": "1:45",
-            "to": "16:45",
+            "from": "6:30",
+            "to": "23:30",
             "playlists": [
               {
                 "playlist_id": 1632,
                 "proportion": 1
+              },
+              {
+                "playlist_id": 288,
+                "proportion": 3
               }
             ]
           }

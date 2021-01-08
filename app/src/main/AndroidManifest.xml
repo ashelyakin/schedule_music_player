@@ -12,10 +12,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ScheduleMusicPlayer">
 
-        <activity android:name=".PlaybackActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".activity.PlaybackActivity" android:screenOrientation="portrait"/>
 
 
-        <activity android:name=".MainActivity"
+        <activity android:name=".activity.MainActivity"
             android:screenOrientation="portrait">
 
             <intent-filter>

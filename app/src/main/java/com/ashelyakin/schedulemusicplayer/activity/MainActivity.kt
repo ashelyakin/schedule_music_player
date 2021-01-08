@@ -1,4 +1,4 @@
-package com.ashelyakin.schedulemusicplayer
+package com.ashelyakin.schedulemusicplayer.activity
 
 import android.content.Intent
 import android.os.Bundle
@@ -12,6 +12,9 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.ashelyakin.schedulemusicplayer.R
+import com.ashelyakin.schedulemusicplayer.TimezonePlaylistsViewModel
+import com.ashelyakin.schedulemusicplayer.TimezonePlaylistsViewModelFactory
 import com.ashelyakin.schedulemusicplayer.dialogFragment.InetUnavailableDialogFragment
 import com.ashelyakin.schedulemusicplayer.dialogFragment.LoadFinishDialogFragment
 import com.ashelyakin.schedulemusicplayer.dialogFragment.LoadStartDialogFragment
@@ -20,10 +23,8 @@ import com.ashelyakin.schedulemusicplayer.download.DownloadViewModel
 import com.ashelyakin.schedulemusicplayer.download.Downloader
 import com.ashelyakin.schedulemusicplayer.profile.Profile
 import com.ashelyakin.schedulemusicplayer.profile.ProfileLoader
-import com.ashelyakin.schedulemusicplayer.profile.Schedule
 import com.ashelyakin.schedulemusicplayer.recyclerView.RecyclerAdapter
 import kotlinx.android.synthetic.main.activity_main.*
-import java.util.concurrent.atomic.AtomicInteger
 
 
 class MainActivity : AppCompatActivity() {
@@ -38,7 +39,6 @@ class MainActivity : AppCompatActivity() {
 
         profile = ProfileLoader.getProfileFromJson(this, "testWithoutComments.json")
         title = profile.name
-        initPlaylistDataAndSetId(profile.schedule)
 
         downloadViewModel = ViewModelProvider(this).get(DownloadViewModel::class.java)
 
@@ -76,16 +76,7 @@ class MainActivity : AppCompatActivity() {
         timezonePlaylistsViewModel.minusProportion(proportionView.tag as Int)
     }
 
-    var uuid = AtomicInteger(0)
-    private fun initPlaylistDataAndSetId(schedule: Schedule) {
-        for (day in schedule.days)
-            for (timezone in day.timeZones)
-                for (playlist in timezone.playlists){
-                    val newID = uuid.getAndIncrement()
-                    SchedulePlaylistsData.setPlaylistsData(newID, schedule.playlists.filter { it.id == playlist.playlistID }[0])
-                    playlist.playlistID = newID
-                }
-    }
+
 
     private fun downloadMp3() {
         val downloader =
