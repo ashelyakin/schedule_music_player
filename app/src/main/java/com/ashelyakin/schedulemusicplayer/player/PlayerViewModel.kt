@@ -4,25 +4,26 @@ import android.app.Activity
 import android.content.Context
 import android.net.Uri
 import android.util.Log
-import android.widget.TextView
-import androidx.lifecycle.*
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import com.ashelyakin.schedulemusicplayer.SchedulePlaylistsData
 import com.ashelyakin.schedulemusicplayer.profile.Schedule
 import com.ashelyakin.schedulemusicplayer.profile.TimeZonePlaylist
 import com.ashelyakin.schedulemusicplayer.util.TimezoneUtil
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.SimpleExoPlayer
-import java.io.File
-import com.ashelyakin.schedulemusicplayer.R
 import kotlinx.android.synthetic.main.activity_playback.*
+import java.io.File
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
+import kotlin.collections.find
+import kotlin.collections.set
 
 class PlayerViewModel(private val activity: Activity, private val player: SimpleExoPlayer, private val schedule: Schedule): ViewModel() {
 
     val TAG = "PlayerViewModel"
 
     var currentPlaylist = MutableLiveData<TimeZonePlaylist>()
-
-    private var lastAddedMediaItemFromCurrentPlaylist = MutableLiveData<MediaItem>()
 
     private val playlistsPosition = HashMap<Int, Int>()
 
@@ -42,7 +43,7 @@ class PlayerViewModel(private val activity: Activity, private val player: Simple
             addMediaItemsToPlayer()
         }
     }
-    
+
     private fun addMediaItemsToPlayer() {
         Log.i(TAG, "adding mediaItems to player")
 
@@ -65,10 +66,10 @@ class PlayerViewModel(private val activity: Activity, private val player: Simple
         val mediaItemsToAdd = ArrayList<MediaItem>()
         for (i in 1..nextPlaylist.proportion)
         {
-            val trackIndex = (playlistsPosition[nextPlaylist.playlistID]!! + i) % files.size
+            val trackIndex = (playlistsPosition[nextPlaylist.playlistID]!! + 1) % files.size
+            playlistsPosition[nextPlaylist.playlistID] = trackIndex
             val mediaItemToAdd = getMediaItem(activity, files[trackIndex])
             mediaItemsToAdd.add(mediaItemToAdd)
-            lastAddedMediaItemFromCurrentPlaylist.postValue(mediaItemToAdd)
         }
         activity.runOnUiThread {
             player.addMediaItems(mediaItemsToAdd)
@@ -88,9 +89,13 @@ class PlayerViewModel(private val activity: Activity, private val player: Simple
         )
     }
 
-    fun checkSwitchingPlaylistAndAddTracks(mediaItem: MediaItem) {
-        if (mediaItem == lastAddedMediaItemFromCurrentPlaylist.value) {
+    private var countAddedTracksFromCurrentPlaylist = 0
+    fun checkSwitchingPlaylistAndAddTracks() {
+        countAddedTracksFromCurrentPlaylist++
+        if (countAddedTracksFromCurrentPlaylist == currentPlaylist.value!!.proportion)
+        {
             Log.i(TAG, "switching playlist")
+            countAddedTracksFromCurrentPlaylist = 0
             addMediaItemsToPlayer()
         }
     }

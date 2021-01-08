@@ -1,4 +1,4 @@
-package com.ashelyakin.schedulemusicplayer
+package com.ashelyakin.schedulemusicplayer.timezonePlaylistsViewModel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -29,7 +29,7 @@ class TimezonePlaylistsViewModel(schedule: Schedule): ViewModel() {
         PLUS, MINUS
     }
 
-    private fun setProportion(id: Int, type: ProportionBtnClickType ){
+    private fun setProportion(id: Int, type: ProportionBtnClickType){
         val timezonePlaylist = timezonePlaylistsData.value?.get(id)
         val currentProportion = timezonePlaylist?.proportion!!
         if (type == ProportionBtnClickType.PLUS)

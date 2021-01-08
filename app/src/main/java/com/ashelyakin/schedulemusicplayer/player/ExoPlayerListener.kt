@@ -16,7 +16,7 @@ class ExoPlayerListener(private val playerViewModel: PlayerViewModel): Player.Ev
             return
 
         playerViewModel.fillView(mediaItem)
-        playerViewModel.checkSwitchingPlaylistAndAddTracks(mediaItem)
+        playerViewModel.checkSwitchingPlaylistAndAddTracks()
     }
 
 }

@@ -1,4 +1,4 @@
-package com.ashelyakin.schedulemusicplayer
+package com.ashelyakin.schedulemusicplayer.timezonePlaylistsViewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
