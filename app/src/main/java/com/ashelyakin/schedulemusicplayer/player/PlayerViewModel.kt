@@ -21,7 +21,7 @@ import kotlin.collections.set
 
 class PlayerViewModel(private val activity: Activity, private val player: SimpleExoPlayer, private val schedule: Schedule): ViewModel() {
 
-    val TAG = "PlayerViewModel"
+    private val TAG = "PlayerViewModel"
 
     var currentPlaylist = MutableLiveData<TimeZonePlaylist>()
 
@@ -29,7 +29,7 @@ class PlayerViewModel(private val activity: Activity, private val player: Simple
 
     init {
         Log.i(TAG, "init")
-        val currentTimezone = TimezoneUtil.getCurrentTimezone(schedule)
+        val currentTimezone = TimezoneUtil.getCurrentTimezone(schedule.days)
         if (currentTimezone?.playlists != null) {
 
             currentPlaylist.postValue(null)
@@ -38,7 +38,6 @@ class PlayerViewModel(private val activity: Activity, private val player: Simple
                 playlistsPosition[playlist.playlistID] = -1
             }
 
-            //TODO перенести добавление listener в playbackActivity, получать viewModel в ExoPlayerListener
             player.addListener(ExoPlayerListener(this))
             addMediaItemsToPlayer()
         }
@@ -47,7 +46,7 @@ class PlayerViewModel(private val activity: Activity, private val player: Simple
     private fun addMediaItemsToPlayer() {
         Log.i(TAG, "adding mediaItems to player")
 
-        val currentTimezone = TimezoneUtil.getCurrentTimezone(schedule) ?: return
+        val currentTimezone = TimezoneUtil.getCurrentTimezone(schedule.days) ?: return
 
         val currentPlaylistIndex = if (currentPlaylist.value != null)
             currentTimezone.playlists.indexOf(currentPlaylist.value!!)
@@ -100,7 +99,13 @@ class PlayerViewModel(private val activity: Activity, private val player: Simple
         }
     }
 
-    fun fillView(mediaItem: MediaItem) {
+    //TODO сделать колбэком из активити
+    fun fillView(mediaItem: MediaItem?) {
+        if (mediaItem == null){
+            activity.playlist_name.text = "Нет запланированных плейлистов на текущее время"
+            activity.track.text = "Нет текущих треков"
+            return
+        }
         val schedulePlaylist = SchedulePlaylistsData.getPlaylistsData(currentPlaylist.value!!.playlistID)
         if (schedulePlaylist != null) {
             activity.playlist_name.text = schedulePlaylist.name

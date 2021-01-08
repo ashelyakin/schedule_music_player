@@ -85,7 +85,7 @@ class PlaybackActivity: AppCompatActivity() {
         val schedulePlayer = SchedulePlayer(this, schedule, player)
 
         Log.i(TAG, "starting player")
-        schedulePlayer.start()
+        schedulePlayer.start(this.viewModelStore)
         Log.i(TAG, "player was started")
     }
 

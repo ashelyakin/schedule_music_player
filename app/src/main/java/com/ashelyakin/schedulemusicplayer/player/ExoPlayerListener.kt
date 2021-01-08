@@ -12,10 +12,12 @@ class ExoPlayerListener(private val playerViewModel: PlayerViewModel): Player.Ev
     override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
         super.onMediaItemTransition(mediaItem, reason)
         Log.i("ExoPlayerListener", "mediaItem was received: ${mediaItem?.mediaId}")
+
+        playerViewModel.fillView(mediaItem)
+
         if (mediaItem == null)
             return
 
-        playerViewModel.fillView(mediaItem)
         playerViewModel.checkSwitchingPlaylistAndAddTracks()
     }
 

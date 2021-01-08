@@ -52,9 +52,9 @@ class TimezoneUtil {
             }
         }
 
-        fun getCurrentTimezone(schedule: Schedule): TimeZone?{
-            for(timezone in schedule.days[LocalDate.now().dayOfWeek.ordinal].timeZones){
-                if (TimezoneUtil.isCurrentTimeInTimezone(timezone.from, timezone.to)) {
+        fun getCurrentTimezone(days: List<Day>): TimeZone?{
+            for(timezone in days[LocalDate.now().dayOfWeek.ordinal].timeZones){
+                if (isCurrentTimeInTimezone(timezone.from, timezone.to)) {
                     return timezone
                 }
             }
@@ -74,7 +74,7 @@ class TimezoneUtil {
             return timeZones
         }
 
-        private fun getDate(time: String, daysToAdd: Int): Date {
+        fun getDate(time: String, daysToAdd: Int): Date {
             val cal = Calendar.getInstance()
             cal.add(Calendar.DATE, daysToAdd)
             val date = cal.time
