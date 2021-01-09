@@ -66,6 +66,8 @@ class MainActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
+
+    //TODO перенести во viewModel
     fun btnProportionPlusClick(view: View){
         val proportionView = getProportionView(view)
         timezonePlaylistsViewModel.plusProportion(proportionView.tag as Int)

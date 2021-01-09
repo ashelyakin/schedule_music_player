@@ -24,7 +24,8 @@ class Downloader(private val callbacks: DownloadCallbacks) {
                 ifInetIsUnavailable()
 
                 val musicFileAbsolutePath = context.filesDir.absolutePath + "/" + musicFile.id + ".mp3"
-                getMp3FromURL(musicFile.fileName, musicFileAbsolutePath)
+                if (!File(musicFileAbsolutePath).exists())
+                    getMp3FromURL(musicFile.fileName, musicFileAbsolutePath)
 
                 progress += step
                 callbacks.onProgressChanged(progress)

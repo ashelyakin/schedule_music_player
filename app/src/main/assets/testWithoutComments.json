@@ -236,7 +236,32 @@
       },
       {
         "day": "saturday",
-        "timeZones": []
+        "timeZones": [
+          {
+            "from": "6:30",
+            "to": "17:57",
+            "playlists": [
+              {
+                "playlist_id": 1632,
+                "proportion": 1
+              },
+              {
+                "playlist_id": 288,
+                "proportion": 3
+              }
+            ]
+          },
+          {
+            "from": "17:58",
+            "to": "22:45",
+            "playlists": [
+              {
+                "playlist_id": 1633,
+                "proportion": 1
+              }
+            ]
+          }
+        ]
       },
       {
         "day": "sunday",

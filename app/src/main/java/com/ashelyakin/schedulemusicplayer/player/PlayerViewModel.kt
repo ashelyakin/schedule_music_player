@@ -38,7 +38,9 @@ class PlayerViewModel(private val activity: Activity, private val player: Simple
                 playlistsPosition[playlist.playlistID] = -1
             }
 
-            player.addListener(ExoPlayerListener(this))
+            activity.runOnUiThread {
+                player.addListener(ExoPlayerListener(this))
+            }
             addMediaItemsToPlayer()
         }
     }
