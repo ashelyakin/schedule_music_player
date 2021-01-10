@@ -5,13 +5,15 @@ import android.util.Log
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
+import com.ashelyakin.schedulemusicplayer.activity.ChangeViewTextCallbacks
 import com.ashelyakin.schedulemusicplayer.profile.Schedule
 import com.ashelyakin.schedulemusicplayer.util.TimezoneUtil
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import java.util.*
 
-class SchedulePlayer(private val activity: Activity, private val schedule: Schedule, private val viewModelStore: ViewModelStore) {
+class SchedulePlayer(private val activity: Activity, private val schedule: Schedule, private val viewModelStore: ViewModelStore,
+                     private val changeViewTextCallbacks: ChangeViewTextCallbacks) {
 
     private val TAG = "SchedulePlayer"
 
@@ -23,7 +25,7 @@ class SchedulePlayer(private val activity: Activity, private val schedule: Sched
 
     init {
         Log.i(TAG, "starting player")
-        timer.schedule(PlayTimerTaskFirstTime(), 0)
+        timer.schedule(PlayTimerTaskManual(), 0)
     }
 
     fun play(){
@@ -50,17 +52,35 @@ class SchedulePlayer(private val activity: Activity, private val schedule: Sched
         }
     }
 
+    private var btnPlayWasNotPressed = true
+    fun changePlayerState(isBtnPlayNow: Boolean){
+        if (isBtnPlayNow) {
+
+            if (btnPlayWasNotPressed) {
+                player.play()
+                btnPlayWasNotPressed = false
+            }
+            else{
+                player.next()
+                player.play()
+            }
+        }
+        else {
+            player.pause()
+        }
+    }
+
     //класс задачи по включению плеера, в соответствии с текущим временем
-    inner class PlayTimerTaskFirstTime() : TimerTask(){
+    inner class PlayTimerTaskManual() : TimerTask(){
         override fun run() {
-            Log.i(TAG, "PlayTimerTaskFirstTime running")
+            Log.i(TAG, "PlayTimerTaskManual running")
             startPlayer()
         }
     }
 
-    inner class PlayTimerTaskAutomatic() : TimerTask() {
+    inner class PlayTimerTaskByTime() : TimerTask() {
         override fun run() {
-            Log.i(TAG, "PlayTimerTaskFirstTime running")
+            Log.i(TAG, "PlayTimerTaskByTime running")
             startPlayer()
             play()
         }
@@ -72,7 +92,7 @@ class SchedulePlayer(private val activity: Activity, private val schedule: Sched
         player = SimpleExoPlayer.Builder(activity).build()
         player.repeatMode = Player.REPEAT_MODE_ALL
 
-        val playerViewModelFactory = PlayerViewModelFactory(activity, player, schedule)
+        val playerViewModelFactory = PlayerViewModelFactory(activity, player, schedule, changeViewTextCallbacks)
         playerViewModel = ViewModelProvider(activity as ViewModelStoreOwner, playerViewModelFactory)
                 .get(PlayerViewModel::class.java)
 
@@ -85,7 +105,7 @@ class SchedulePlayer(private val activity: Activity, private val schedule: Sched
             scheduleStopTimerTask(stopTime, nextTimeZoneDate)
         }
         else
-            timer.schedule(PlayTimerTaskFirstTime(), nextTimeZoneDate)
+            timer.schedule(PlayTimerTaskManual(), nextTimeZoneDate)
     }
 
     private fun scheduleStopTimerTask(stopTime: Date, nextTimeZoneDate: Date) {
@@ -100,7 +120,7 @@ class SchedulePlayer(private val activity: Activity, private val schedule: Sched
                 playerViewModel.fillView(null)
                 player.release()
             }
-            timer.schedule(PlayTimerTaskAutomatic(), nextTimeZoneDate)
+            timer.schedule(PlayTimerTaskByTime(), nextTimeZoneDate)
         }
 
     }

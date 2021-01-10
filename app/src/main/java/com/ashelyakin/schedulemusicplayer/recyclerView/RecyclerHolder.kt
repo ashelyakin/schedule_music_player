@@ -7,14 +7,12 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import com.ashelyakin.schedulemusicplayer.SchedulePlaylistsData
 import com.ashelyakin.schedulemusicplayer.profile.Day
-import com.ashelyakin.schedulemusicplayer.profile.SchedulePlaylist
 import com.ashelyakin.schedulemusicplayer.profile.TimeZone
 import com.ashelyakin.schedulemusicplayer.profile.TimeZonePlaylist
-import com.ashelyakin.schedulemusicplayer.util.MD5
+import com.ashelyakin.schedulemusicplayer.util.Util.Companion.isPlaylistIntegrity
 import kotlinx.android.synthetic.main.day.view.*
 import kotlinx.android.synthetic.main.playlist.view.*
 import kotlinx.android.synthetic.main.timezone.view.*
-import java.io.File
 
 
 class RecyclerHolder(view: View, private val timezonePlaylistsData: MutableLiveData<HashMap<Int, TimeZonePlaylist>>,
@@ -45,22 +43,9 @@ class RecyclerHolder(view: View, private val timezonePlaylistsData: MutableLiveD
         })
 
         //отображаем предупреждение о нецелостности плейлиста
-        if (!isPlaylistIntegrity(schedulePlaylist))
+        if (!isPlaylistIntegrity(schedulePlaylist, itemView.context.filesDir.absolutePath))
             itemView.alert.visibility = View.VISIBLE
     }
 
-    private fun isPlaylistIntegrity(schedulePlaylist: SchedulePlaylist?): Boolean{
-        if (schedulePlaylist == null)
-            return true
-        var res = true
-        val fileDirPath = itemView.context.filesDir.absolutePath
-        schedulePlaylist.files.map {
-            val musicFile = File(fileDirPath, it.id.toString() + ".mp3")
-            if (!MD5.checkMD5(it.md5File, musicFile)){
-                res = false
-                musicFile.delete()
-            }
-        }
-        return res
-    }
+    
 }

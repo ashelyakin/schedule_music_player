@@ -10,8 +10,6 @@ import androidx.appcompat.app.AppCompatActivity
 import com.ashelyakin.schedulemusicplayer.R
 import com.ashelyakin.schedulemusicplayer.player.SchedulePlayer
 import com.ashelyakin.schedulemusicplayer.profile.Schedule
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.SimpleExoPlayer
 import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.android.synthetic.main.activity_playback.*
 
@@ -20,8 +18,6 @@ class PlaybackActivity: AppCompatActivity() {
     val TAG = "PlaybackActivity"
 
     private var isBtnPlayNow = true
-
-    private var btnPlayWasNotPressed = true
 
     private lateinit var schedulePlayer: SchedulePlayer
 
@@ -78,37 +74,47 @@ class PlaybackActivity: AppCompatActivity() {
     private fun initPlayer() {
         AndroidThreeTen.init(this)
 
+        val changeViewTextCallbacks = object: ChangeViewTextCallbacks{
+
+            override fun changePlaylistName(playlistName: String?) {
+                if (playlistName == null){
+                    playlist_name.text = "Нет запланированных плейлистов на текущее время"
+                }
+                else {
+                    playlist_name.text = playlistName
+                }
+            }
+
+            override fun changeTrackName(trackName: String?) {
+                if (trackName == null){
+                    track.text = "Нет текущих треков"
+                }
+                else {
+                    track.text = trackName
+                }
+            }
+        }
+
         val schedule: Schedule = intent.getParcelableExtra("schedule")!!
-        schedulePlayer = SchedulePlayer(this, schedule, this.viewModelStore)
+        schedulePlayer = SchedulePlayer(this, schedule, this.viewModelStore, changeViewTextCallbacks)
     }
 
-    //TODO перенести во viewModel
     fun btnPlayClick(v: View) {
         Log.d(TAG, "btnPlayClick was pressed")
+
+        schedulePlayer.changePlayerState(isBtnPlayNow)
+
         if (isBtnPlayNow) {
             btnPlay.setBackgroundResource(R.mipmap.stop)
-            isBtnPlayNow = !isBtnPlayNow
-
-            if (btnPlayWasNotPressed) {
-                schedulePlayer.play()
-                btnPlayWasNotPressed = false
-            }
-            else{
-                schedulePlayer.next()
-                schedulePlayer.play()
-            }
         }
         else {
             btnPlay.setBackgroundResource(R.mipmap.play)
-            isBtnPlayNow = !isBtnPlayNow
-            schedulePlayer.pause()
         }
+        isBtnPlayNow = !isBtnPlayNow
     }
 
     fun btnNextTrackClick(v: View) {
         schedulePlayer.next()
     }
-
-
 
 }

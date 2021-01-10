@@ -7,7 +7,9 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.ashelyakin.schedulemusicplayer.SchedulePlaylistsData
+import com.ashelyakin.schedulemusicplayer.activity.ChangeViewTextCallbacks
 import com.ashelyakin.schedulemusicplayer.profile.Schedule
+import com.ashelyakin.schedulemusicplayer.profile.TimeZone
 import com.ashelyakin.schedulemusicplayer.profile.TimeZonePlaylist
 import com.ashelyakin.schedulemusicplayer.util.TimezoneUtil
 import com.google.android.exoplayer2.MediaItem
@@ -19,7 +21,8 @@ import kotlin.collections.HashMap
 import kotlin.collections.find
 import kotlin.collections.set
 
-class PlayerViewModel(private val activity: Activity, private val player: SimpleExoPlayer, private val schedule: Schedule): ViewModel() {
+class PlayerViewModel(private val activity: Activity, private val player: SimpleExoPlayer, private val schedule: Schedule,
+                      private val changeViewTextCallbacks: ChangeViewTextCallbacks): ViewModel() {
 
     private val TAG = "PlayerViewModel"
 
@@ -50,17 +53,9 @@ class PlayerViewModel(private val activity: Activity, private val player: Simple
 
         val currentTimezone = TimezoneUtil.getCurrentTimezone(schedule.days) ?: return
 
-        val currentPlaylistIndex = if (currentPlaylist.value != null)
-            currentTimezone.playlists.indexOf(currentPlaylist.value!!)
-        else
-            -1
+        val indexOfNextPlaylist = getIndexOfNextPlaylist(currentTimezone)
 
-        val nextPlaylistIndex = if (currentPlaylistIndex == currentTimezone.playlists.size - 1)
-            0
-        else
-            currentPlaylistIndex + 1
-
-        val nextPlaylist = currentTimezone.playlists[nextPlaylistIndex]
+        val nextPlaylist = currentTimezone.playlists[indexOfNextPlaylist]
         currentPlaylist.postValue(nextPlaylist)
 
         val files = SchedulePlaylistsData.getPlaylistsData(nextPlaylist.playlistID)?.files ?: return
@@ -77,6 +72,21 @@ class PlayerViewModel(private val activity: Activity, private val player: Simple
             player.prepare()
         }
 
+    }
+
+    private fun getIndexOfNextPlaylist(currentTimezone: TimeZone): Int{
+        val indexOfCurrentPlaylist = getIndexOfCurrentPlaylist(currentTimezone)
+        return if (indexOfCurrentPlaylist == currentTimezone.playlists.size - 1)
+            0
+        else
+            indexOfCurrentPlaylist + 1
+    }
+
+    private fun getIndexOfCurrentPlaylist(currentTimezone: TimeZone): Int{
+        return if (currentPlaylist.value != null)
+            currentTimezone.playlists.indexOf(currentPlaylist.value!!)
+        else
+            -1
     }
 
     private fun getMediaItem(context: Context, file: com.ashelyakin.schedulemusicplayer.profile.File): MediaItem {
@@ -101,20 +111,20 @@ class PlayerViewModel(private val activity: Activity, private val player: Simple
         }
     }
 
-    //TODO сделать колбэком из активити
     fun fillView(mediaItem: MediaItem?) {
         if (mediaItem == null){
-            activity.playlist_name.text = "Нет запланированных плейлистов на текущее время"
-            activity.track.text = "Нет текущих треков"
-            return
+            changeViewTextCallbacks.changePlaylistName(null)
+            changeViewTextCallbacks.changeTrackName(null)
         }
-        val schedulePlaylist = SchedulePlaylistsData.getPlaylistsData(currentPlaylist.value!!.playlistID)
-        if (schedulePlaylist != null) {
-            activity.playlist_name.text = schedulePlaylist.name
+        else {
+            val schedulePlaylist = SchedulePlaylistsData.getPlaylistsData(currentPlaylist.value!!.playlistID)
+            if (schedulePlaylist != null) {
+                changeViewTextCallbacks.changePlaylistName(schedulePlaylist.name)
 
-            val currentTrackID = getTrackIdFromMediaId(mediaItem.mediaId)
-            val currentTrack = schedulePlaylist.files.find { it.id == currentTrackID }
-            activity.track.text = currentTrack?.name
+                val currentTrackID = getTrackIdFromMediaId(mediaItem.mediaId)
+                val currentTrack = schedulePlaylist.files.find { it.id == currentTrackID }
+                changeViewTextCallbacks.changeTrackName(currentTrack?.name)
+            }
         }
     }
 

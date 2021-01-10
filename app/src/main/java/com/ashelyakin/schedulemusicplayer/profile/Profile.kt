@@ -8,7 +8,6 @@ import android.os.Parcelable
 import com.beust.klaxon.Json
 import com.beust.klaxon.Klaxon
 import kotlinx.android.parcel.Parcelize
-import java.io.Serializable
 
 private val klaxon = Klaxon()
 

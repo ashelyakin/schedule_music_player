@@ -1,7 +1,6 @@
 package com.ashelyakin.schedulemusicplayer.util
 
 import com.ashelyakin.schedulemusicplayer.profile.Day
-import com.ashelyakin.schedulemusicplayer.profile.Schedule
 import com.ashelyakin.schedulemusicplayer.profile.TimeZone
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime

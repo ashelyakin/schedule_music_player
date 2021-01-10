@@ -1,8 +1,6 @@
 package com.ashelyakin.schedulemusicplayer.player
 
 import android.util.Log
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.Observer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 

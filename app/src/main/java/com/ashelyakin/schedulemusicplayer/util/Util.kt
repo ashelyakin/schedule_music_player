@@ -2,19 +2,34 @@ package com.ashelyakin.schedulemusicplayer.util
 
 import android.text.TextUtils
 import android.util.Log
+import com.ashelyakin.schedulemusicplayer.profile.SchedulePlaylist
 import java.io.*
 import java.math.BigInteger
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 
 
-class MD5 {
+class Util {
 
     companion object {
 
         private val TAG = "MD5"
 
-        fun checkMD5(md5: String, updateFile: File?): Boolean {
+        fun isPlaylistIntegrity(schedulePlaylist: SchedulePlaylist?, filesDirPath: String): Boolean{
+            if (schedulePlaylist == null)
+                return true
+            var res = true
+            schedulePlaylist.files.map {
+                val musicFile = File(filesDirPath, it.id.toString() + ".mp3")
+                if (!checkMD5(it.md5File, musicFile)){
+                    res = false
+                    musicFile.delete()
+                }
+            }
+            return res
+        }
+
+        private fun checkMD5(md5: String, updateFile: File?): Boolean {
             if (TextUtils.isEmpty(md5) || updateFile == null) {
                 Log.e(TAG, "MD5 string empty or updateFile null")
                 return false

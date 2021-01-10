@@ -66,8 +66,6 @@ class MainActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-
-    //TODO перенести во viewModel
     fun btnProportionPlusClick(view: View){
         val proportionView = getProportionView(view)
         timezonePlaylistsViewModel.plusProportion(proportionView.tag as Int)
@@ -78,7 +76,10 @@ class MainActivity : AppCompatActivity() {
         timezonePlaylistsViewModel.minusProportion(proportionView.tag as Int)
     }
 
-
+    private fun getProportionView(view: View): TextView {
+        val linearLayout = (view.parent as ViewGroup).parent as LinearLayout
+        return linearLayout.findViewById(R.id.proportion)
+    }
 
     private fun downloadMp3() {
         val downloader =
@@ -128,8 +129,4 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun getProportionView(view: View): TextView {
-        val linearLayout = (view.parent as ViewGroup).parent as LinearLayout
-        return linearLayout.findViewById(R.id.proportion)
-    }
 }
