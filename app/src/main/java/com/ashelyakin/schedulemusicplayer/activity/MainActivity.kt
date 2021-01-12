@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ashelyakin.schedulemusicplayer.R
@@ -46,7 +47,31 @@ class MainActivity : AppCompatActivity() {
         timezonePlaylistsViewModel = ViewModelProvider(this, timezonePlaylistsViewModelFactory)
                 .get(TimezonePlaylistsViewModel::class.java)
 
-        downloadMp3()
+        observeDownloadState()
+    }
+
+    private fun observeDownloadState() {
+
+        val loadStartDialogFragment = LoadStartDialogFragment()
+        val inetUnavailableDialogFragment = InetUnavailableDialogFragment()
+        val loadFinishDialogFragment = LoadFinishDialogFragment()
+
+        downloadViewModel.downloadState.observe(this, Observer{
+            when (it){
+                DownloadViewModel.DownloadState.STARTED -> loadStartDialogFragment.show(supportFragmentManager, "loadStartDialog")
+                DownloadViewModel.DownloadState.RESUMED -> inetUnavailableDialogFragment.dismiss()
+                DownloadViewModel.DownloadState.STOPPED -> {
+                    inetUnavailableDialogFragment.isCancelable = false
+                    inetUnavailableDialogFragment.show(supportFragmentManager, "inetUnavailableDialogFragment")
+                }
+                DownloadViewModel.DownloadState.FINISHED -> {
+                    loadStartDialogFragment.dismiss()
+                    loadFinishDialogFragment.show(supportFragmentManager, "loadFinishDialog")
+                    inflateRecycler()
+                }
+                else -> Log.i("Downloader", "Download completed")
+            }
+        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -81,52 +106,9 @@ class MainActivity : AppCompatActivity() {
         return linearLayout.findViewById(R.id.proportion)
     }
 
-    private fun downloadMp3() {
-        val downloader =
-            Downloader(object :
-                DownloadCallbacks {
-
-                val loadStartDialogFragment = LoadStartDialogFragment()
-                val inetUnavailableDialogFragment = InetUnavailableDialogFragment()
-                val loadFinishDialogFragment = LoadFinishDialogFragment()
-
-                override fun onLoadStart() {
-                    loadStartDialogFragment.show(supportFragmentManager, "loadStartDialog")
-                    Log.i("Downloader", "Download started")
-                }
-
-                override fun onProgressChanged(newProgress: Int) {
-                    downloadViewModel.progress.postValue(newProgress)
-                }
-
-                override fun onLoadFinished() {
-                    loadStartDialogFragment.dismiss()
-                    loadFinishDialogFragment.show(supportFragmentManager, "loadFinishDialog")
-                    Log.i("Downloader", "Download completed")
-                    inflateRecycler()
-                }
-
-
-                override fun onLoadStopped() {
-                    inetUnavailableDialogFragment.isCancelable = false
-                    inetUnavailableDialogFragment.show(supportFragmentManager, "inetUnavailableDialogFragment")
-                    Log.i("Downloader", "Download stopped")
-                }
-
-                override fun onLoadResume() {
-                    inetUnavailableDialogFragment.dismiss()
-                    Log.i("Downloader", "Download resumed")
-                }
-
-            })
-        downloader.downloadMp3(this)
-    }
-
     private fun inflateRecycler(){
-        this.runOnUiThread {
-            main_recyclerView.adapter = RecyclerAdapter(profile.schedule, timezonePlaylistsViewModel.timezonePlaylistsData, this)
-            main_recyclerView.layoutManager = LinearLayoutManager(this)
-        }
+        main_recyclerView.adapter = RecyclerAdapter(profile.schedule, timezonePlaylistsViewModel.timezonePlaylistsData, this)
+        main_recyclerView.layoutManager = LinearLayoutManager(this)
     }
 
 }
