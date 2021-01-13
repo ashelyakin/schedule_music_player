@@ -13,7 +13,7 @@ class PlayerViewModelFactory(private val schedule: Schedule, private val playerC
 
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(PlayerViewModel::class.java)) {
-            return PlayerViewModel(schedule, playerCallbacks, store,  changeViewTextCallbacks, application) as T
+            return PlayerViewModel(schedule, playerCallbacks, changeViewTextCallbacks, application) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

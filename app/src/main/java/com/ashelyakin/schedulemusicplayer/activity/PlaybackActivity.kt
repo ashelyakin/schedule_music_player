@@ -79,40 +79,32 @@ class PlaybackActivity: AppCompatActivity() {
     inner class PlayerCallbacks: com.ashelyakin.schedulemusicplayer.player.PlayerCallbacks{
         override fun play(player: SimpleExoPlayer) {
             runOnUiThread {  player.play()}
-
         }
 
         override fun pause(player: SimpleExoPlayer) {
             runOnUiThread { player.pause() }
-
         }
 
         override fun next(player: SimpleExoPlayer) {
             runOnUiThread { player.next() }
-
         }
 
         override fun release(player: SimpleExoPlayer) {
             runOnUiThread { player.release() }
-
         }
 
         override fun addListener(player: SimpleExoPlayer, listener: ExoPlayerListener) {
             runOnUiThread { player.addListener((listener)) }
-
         }
 
         override fun addMediaItems(player: SimpleExoPlayer, mediaItems: List<MediaItem>) {
             runOnUiThread { player.addMediaItems(mediaItems) }
-
         }
 
         override fun prepare(player: SimpleExoPlayer) {
             runOnUiThread { player.prepare() }
-
         }
     }
-
 
     private fun initPlayer() {
         AndroidThreeTen.init(this)

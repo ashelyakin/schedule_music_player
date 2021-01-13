@@ -11,15 +11,13 @@ import com.ashelyakin.schedulemusicplayer.util.TimezoneUtil
 import com.google.android.exoplayer2.MediaItem
 import java.io.File
 
-class PlaylistManager(private val playerViewModel: PlayerViewModel, private val schedule: Schedule,
-                      private val playerCallbacks: PlayerCallbacks,
-                      private val changeViewTextCallbacks: ChangeViewTextCallbacks, private val context: Context){
+class PlaylistManager(private val playerViewModel: PlayerViewModel, private val context: Context){
 
     private val TAG = "PlayerViewModel"
 
     init {
         Log.i(TAG, "init")
-        val currentTimezone = TimezoneUtil.getCurrentTimezone(schedule.days)
+        val currentTimezone = TimezoneUtil.getCurrentTimezone(playerViewModel.schedule.days)
         if (currentTimezone?.playlists != null) {
 
             playerViewModel.currentPlaylist.postValue(null)
@@ -28,15 +26,14 @@ class PlaylistManager(private val playerViewModel: PlayerViewModel, private val 
                 playerViewModel.playlistsPosition[playlist.playlistID] = -1
             }
 
-            playerCallbacks.addListener(playerViewModel.player, ExoPlayerListener(this))
             addMediaItemsToPlaylist()
         }
     }
 
-    private fun addMediaItemsToPlaylist() {
+    fun addMediaItemsToPlaylist() {
         Log.i(TAG, "adding mediaItems to player")
 
-        val currentTimezone = TimezoneUtil.getCurrentTimezone(schedule.days) ?: return
+        val currentTimezone = TimezoneUtil.getCurrentTimezone(playerViewModel.schedule.days) ?: return
 
         val indexOfNextPlaylist = getIndexOfNextPlaylist(currentTimezone)
 
@@ -53,8 +50,8 @@ class PlaylistManager(private val playerViewModel: PlayerViewModel, private val 
             mediaItemsToAdd.add(mediaItemToAdd)
         }
 
-        playerCallbacks.addMediaItems(playerViewModel.player, mediaItemsToAdd)
-        playerCallbacks.prepare(playerViewModel.player)
+        playerViewModel.playerCallbacks.addMediaItems(playerViewModel.player, mediaItemsToAdd)
+        playerViewModel.playerCallbacks.prepare(playerViewModel.player)
 
     }
 
@@ -82,38 +79,6 @@ class PlaylistManager(private val playerViewModel: PlayerViewModel, private val 
                 )
             )
         )
-    }
-
-    private var countAddedTracksFromCurrentPlaylist = 0
-    fun checkSwitchingPlaylistAndAddTracks() {
-        countAddedTracksFromCurrentPlaylist++
-        if (countAddedTracksFromCurrentPlaylist == playerViewModel.currentPlaylist.value!!.proportion)
-        {
-            Log.i(TAG, "switching playlist")
-            countAddedTracksFromCurrentPlaylist = 0
-            addMediaItemsToPlaylist()
-        }
-    }
-
-    fun fillView(mediaItem: MediaItem?) {
-        if (mediaItem == null){
-            changeViewTextCallbacks.changePlaylistName(null)
-            changeViewTextCallbacks.changeTrackName(null)
-        }
-        else {
-            val schedulePlaylist = SchedulePlaylistsData.getPlaylistsData(playerViewModel.currentPlaylist.value!!.playlistID)
-            if (schedulePlaylist != null) {
-                changeViewTextCallbacks.changePlaylistName(schedulePlaylist.name)
-
-                val currentTrackID = getTrackIdFromMediaId(mediaItem.mediaId)
-                val currentTrack = schedulePlaylist.files.find { it.id == currentTrackID }
-                changeViewTextCallbacks.changeTrackName(currentTrack?.name)
-            }
-        }
-    }
-
-    private fun getTrackIdFromMediaId(mediaId: String?): Int {
-        return mediaId?.substringBeforeLast('.')?.substringAfterLast('/')?.toInt() ?: -1
     }
 
 }

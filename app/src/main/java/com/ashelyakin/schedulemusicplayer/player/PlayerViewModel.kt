@@ -3,26 +3,25 @@ package com.ashelyakin.schedulemusicplayer.player
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
+import com.ashelyakin.schedulemusicplayer.SchedulePlaylistsData
 import com.ashelyakin.schedulemusicplayer.activity.ChangeViewTextCallbacks
 import com.ashelyakin.schedulemusicplayer.profile.Schedule
 import com.ashelyakin.schedulemusicplayer.profile.TimeZonePlaylist
 import com.ashelyakin.schedulemusicplayer.util.TimezoneUtil
+import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.SimpleExoPlayer
 import java.util.*
 
-class PlayerViewModel(private val schedule: Schedule, private val playerCallbacks: PlayerCallbacks, private val viewModelStore: ViewModelStore,
+class PlayerViewModel(val schedule: Schedule, val playerCallbacks: PlayerCallbacks,
                       private val changeViewTextCallbacks: ChangeViewTextCallbacks, application: Application): AndroidViewModel(application) {
 
     private val TAG = "SchedulePlayer"
 
     private val timer = Timer()
 
-    lateinit var player: SimpleExoPlayer
-
     private lateinit var playlistManager: PlaylistManager
-
+    lateinit var player: SimpleExoPlayer
     var currentPlaylist = MutableLiveData<TimeZonePlaylist>()
-
     var playlistsPosition = HashMap<Int, Int>()
 
     init {
@@ -81,11 +80,10 @@ class PlayerViewModel(private val schedule: Schedule, private val playerCallback
     }
 
     private fun startPlayer(){
-        viewModelStore.clear()
-
-        player = SimpleExoPlayer.Builder(getApplication<Application>().applicationContext).build()
-
-        playlistManager = PlaylistManager(this, schedule, playerCallbacks, changeViewTextCallbacks, getApplication<Application>().applicationContext)
+        val applicationContext = getApplication<Application>().applicationContext
+        player = SimpleExoPlayer.Builder(applicationContext).build()
+        playerCallbacks.addListener(player, ExoPlayerListener(this))
+        playlistManager = PlaylistManager(this, applicationContext)
 
         //если есть таймзона соответсвующая текущему времени, то создаем задачу на остановку плеера,
         //иначе создаем задачу на обновление плеера по наступлению времени следующей таймзоны
@@ -107,11 +105,42 @@ class PlayerViewModel(private val schedule: Schedule, private val playerCallback
 
         override fun run() {
             Log.i(TAG, "StopPlayTimerTask running")
-            playlistManager.fillView(null)
+            fillView(null)
             playerCallbacks.release(player)
             timer.schedule(PlayTimerTaskByTime(), nextTimeZoneDate)
         }
+    }
 
+    private var countAddedTracksFromCurrentPlaylist = 0
+    fun checkSwitchingPlaylistAndAddTracks() {
+        countAddedTracksFromCurrentPlaylist++
+        if (countAddedTracksFromCurrentPlaylist == currentPlaylist.value!!.proportion)
+        {
+            Log.i(TAG, "switching playlist")
+            countAddedTracksFromCurrentPlaylist = 0
+            playlistManager.addMediaItemsToPlaylist()
+        }
+    }
+
+    fun fillView(mediaItem: MediaItem?) {
+        if (mediaItem == null){
+            changeViewTextCallbacks.changePlaylistName(null)
+            changeViewTextCallbacks.changeTrackName(null)
+        }
+        else {
+            val schedulePlaylist = SchedulePlaylistsData.getPlaylistsData(currentPlaylist.value!!.playlistID)
+            if (schedulePlaylist != null) {
+                changeViewTextCallbacks.changePlaylistName(schedulePlaylist.name)
+
+                val currentTrackID = getTrackIdFromMediaId(mediaItem.mediaId)
+                val currentTrack = schedulePlaylist.files.find { it.id == currentTrackID }
+                changeViewTextCallbacks.changeTrackName(currentTrack?.name)
+            }
+        }
+    }
+
+    private fun getTrackIdFromMediaId(mediaId: String?): Int {
+        return mediaId?.substringBeforeLast('.')?.substringAfterLast('/')?.toInt() ?: -1
     }
 
 }
