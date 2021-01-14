@@ -12,5 +12,4 @@ interface PlayerCallbacks {
     fun addListener(listener: ExoPlayerListener)
     fun addMediaItems(mediaItems: List<MediaItem>)
     fun prepare()
-    fun clearMediaItems()
 }

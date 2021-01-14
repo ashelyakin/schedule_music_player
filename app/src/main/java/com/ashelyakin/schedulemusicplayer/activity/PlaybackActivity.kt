@@ -103,9 +103,6 @@ class PlaybackActivity: AppCompatActivity() {
             runOnUiThread {  playerViewModel.player.prepare() }
         }
 
-        override fun clearMediaItems() {
-            runOnUiThread {  playerViewModel.player.clearMediaItems() }
-        }
     }
 
     private fun initPlayer() {

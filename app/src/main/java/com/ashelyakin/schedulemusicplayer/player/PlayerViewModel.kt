@@ -112,7 +112,7 @@ class PlayerViewModel(application: Application): AndroidViewModel(application) {
         override fun run() {
             Log.i(TAG, "StopPlayTimerTask running")
             fillView(null)
-            playerCallbacks.clearMediaItems()
+            playerCallbacks.release()
             timer.schedule(PlayTimerTaskByTime(), nextTimeZoneDate)
         }
     }
