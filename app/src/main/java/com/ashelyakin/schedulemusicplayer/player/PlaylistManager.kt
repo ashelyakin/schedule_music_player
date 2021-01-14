@@ -50,8 +50,8 @@ class PlaylistManager(private val playerViewModel: PlayerViewModel, private val 
             mediaItemsToAdd.add(mediaItemToAdd)
         }
 
-        playerViewModel.playerCallbacks.addMediaItems(playerViewModel.player, mediaItemsToAdd)
-        playerViewModel.playerCallbacks.prepare(playerViewModel.player)
+        playerViewModel.playerCallbacks.addMediaItems(mediaItemsToAdd)
+        playerViewModel.playerCallbacks.prepare()
 
     }
 

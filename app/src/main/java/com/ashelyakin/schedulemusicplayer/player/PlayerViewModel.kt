@@ -12,37 +12,45 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.SimpleExoPlayer
 import java.util.*
 
-class PlayerViewModel(val schedule: Schedule, val playerCallbacks: PlayerCallbacks,
-                      private val changeViewTextCallbacks: ChangeViewTextCallbacks, application: Application): AndroidViewModel(application) {
+class PlayerViewModel(application: Application): AndroidViewModel(application) {
 
     private val TAG = "SchedulePlayer"
 
     private val timer = Timer()
+
+    lateinit var schedule: Schedule
+    lateinit var playerCallbacks: PlayerCallbacks
+    private lateinit var changeViewTextCallbacks: ChangeViewTextCallbacks
 
     private lateinit var playlistManager: PlaylistManager
     lateinit var player: SimpleExoPlayer
     var currentPlaylist = MutableLiveData<TimeZonePlaylist>()
     var playlistsPosition = HashMap<Int, Int>()
 
-    init {
+    fun initPlayer(schedule: Schedule, playerCallbacks: PlayerCallbacks, changeViewTextCallbacks: ChangeViewTextCallbacks){
         Log.i(TAG, "starting player")
+
+        this.schedule = schedule
+        this. playerCallbacks = playerCallbacks
+        this.changeViewTextCallbacks = changeViewTextCallbacks
+
         timer.schedule(PlayTimerTaskManual(), 0)
     }
 
     fun play(){
-        playerCallbacks.play(player)
+        playerCallbacks.play()
     }
 
     fun pause(){
-        playerCallbacks.pause(player)
+        playerCallbacks.pause()
     }
 
     fun next(){
-        playerCallbacks.next(player)
+        playerCallbacks.next()
     }
 
     fun release(){
-        playerCallbacks.release(player)
+        playerCallbacks.release()
     }
 
     private var btnPlayWasNotPressed = true
@@ -80,11 +88,9 @@ class PlayerViewModel(val schedule: Schedule, val playerCallbacks: PlayerCallbac
     }
 
     private fun startPlayer(){
-        val applicationContext = getApplication<Application>().applicationContext
-        player = SimpleExoPlayer.Builder(applicationContext).build()
-        playerCallbacks.addListener(player, ExoPlayerListener(this))
-        playlistManager = PlaylistManager(this, applicationContext)
-
+        player = SimpleExoPlayer.Builder(getApplication<Application>().applicationContext).build()
+        playerCallbacks.addListener(ExoPlayerListener(this))
+        playlistManager = PlaylistManager(this, getApplication<Application>().applicationContext)
         //если есть таймзона соответсвующая текущему времени, то создаем задачу на остановку плеера,
         //иначе создаем задачу на обновление плеера по наступлению времени следующей таймзоны
         val nextTimeZoneDate = TimezoneUtil.getNextTimezone(schedule.days) ?: return
@@ -106,7 +112,7 @@ class PlayerViewModel(val schedule: Schedule, val playerCallbacks: PlayerCallbac
         override fun run() {
             Log.i(TAG, "StopPlayTimerTask running")
             fillView(null)
-            playerCallbacks.release(player)
+            playerCallbacks.clearMediaItems()
             timer.schedule(PlayTimerTaskByTime(), nextTimeZoneDate)
         }
     }

@@ -10,11 +10,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.ashelyakin.schedulemusicplayer.R
 import com.ashelyakin.schedulemusicplayer.player.ExoPlayerListener
-import com.ashelyakin.schedulemusicplayer.player.PlayerViewModelFactory
 import com.ashelyakin.schedulemusicplayer.player.PlayerViewModel
 import com.ashelyakin.schedulemusicplayer.profile.Schedule
 import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.SimpleExoPlayer
 import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.android.synthetic.main.activity_playback.*
 
@@ -77,32 +75,36 @@ class PlaybackActivity: AppCompatActivity() {
     }
 
     inner class PlayerCallbacks: com.ashelyakin.schedulemusicplayer.player.PlayerCallbacks{
-        override fun play(player: SimpleExoPlayer) {
-            runOnUiThread {  player.play()}
+        override fun play() {
+            runOnUiThread {  playerViewModel.player.play()}
         }
 
-        override fun pause(player: SimpleExoPlayer) {
-            runOnUiThread { player.pause() }
+        override fun pause() {
+            runOnUiThread {  playerViewModel.player.pause() }
         }
 
-        override fun next(player: SimpleExoPlayer) {
-            runOnUiThread { player.next() }
+        override fun next() {
+            runOnUiThread {  playerViewModel.player.next() }
         }
 
-        override fun release(player: SimpleExoPlayer) {
-            runOnUiThread { player.release() }
+        override fun release() {
+            runOnUiThread {  playerViewModel.player.release() }
         }
 
-        override fun addListener(player: SimpleExoPlayer, listener: ExoPlayerListener) {
-            runOnUiThread { player.addListener((listener)) }
+        override fun addListener(listener: ExoPlayerListener) {
+            runOnUiThread {  playerViewModel.player.addListener((listener)) }
         }
 
-        override fun addMediaItems(player: SimpleExoPlayer, mediaItems: List<MediaItem>) {
-            runOnUiThread { player.addMediaItems(mediaItems) }
+        override fun addMediaItems(mediaItems: List<MediaItem>) {
+            runOnUiThread {  playerViewModel.player.addMediaItems(mediaItems) }
         }
 
-        override fun prepare(player: SimpleExoPlayer) {
-            runOnUiThread { player.prepare() }
+        override fun prepare() {
+            runOnUiThread {  playerViewModel.player.prepare() }
+        }
+
+        override fun clearMediaItems() {
+            runOnUiThread {  playerViewModel.player.clearMediaItems() }
         }
     }
 
@@ -135,9 +137,9 @@ class PlaybackActivity: AppCompatActivity() {
         }
 
         val schedule: Schedule = intent.getParcelableExtra("schedule")!!
-        val playerViewModelFactory = PlayerViewModelFactory(schedule, PlayerCallbacks(), this.viewModelStore, changeViewTextCallbacks, application)
-        playerViewModel = ViewModelProvider(this, playerViewModelFactory)
-                .get(PlayerViewModel::class.java)
+        //val playerViewModelFactory = PlayerViewModelFactory(schedule, PlayerCallbacks(), this.viewModelStore, changeViewTextCallbacks, application)
+        playerViewModel = ViewModelProvider(this).get(PlayerViewModel::class.java)
+        playerViewModel.initPlayer(schedule, PlayerCallbacks(), changeViewTextCallbacks)
     }
 
     fun btnPlayClick(v: View) {
