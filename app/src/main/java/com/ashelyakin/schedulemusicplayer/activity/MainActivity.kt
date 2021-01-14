@@ -5,10 +5,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
-import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -19,11 +15,10 @@ import com.ashelyakin.schedulemusicplayer.timezonePlaylistsViewModel.TimezonePla
 import com.ashelyakin.schedulemusicplayer.dialogFragment.InetUnavailableDialogFragment
 import com.ashelyakin.schedulemusicplayer.dialogFragment.LoadFinishDialogFragment
 import com.ashelyakin.schedulemusicplayer.dialogFragment.LoadStartDialogFragment
-import com.ashelyakin.schedulemusicplayer.download.DownloadCallbacks
 import com.ashelyakin.schedulemusicplayer.download.DownloadViewModel
-import com.ashelyakin.schedulemusicplayer.download.Downloader
 import com.ashelyakin.schedulemusicplayer.profile.Profile
 import com.ashelyakin.schedulemusicplayer.profile.ProfileLoader
+import com.ashelyakin.schedulemusicplayer.recyclerView.ChangeProportionCallbacks
 import com.ashelyakin.schedulemusicplayer.recyclerView.RecyclerAdapter
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -42,12 +37,13 @@ class MainActivity : AppCompatActivity() {
         title = profile.name
 
         downloadViewModel = ViewModelProvider(this).get(DownloadViewModel::class.java)
+        observeDownloadState()
 
         val timezonePlaylistsViewModelFactory = TimezonePlaylistsViewModelFactory(profile.schedule)
         timezonePlaylistsViewModel = ViewModelProvider(this, timezonePlaylistsViewModelFactory)
                 .get(TimezonePlaylistsViewModel::class.java)
 
-        observeDownloadState()
+
     }
 
     private fun observeDownloadState() {
@@ -91,24 +87,21 @@ class MainActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    fun btnProportionPlusClick(view: View){
-        val proportionView = getProportionView(view)
-        timezonePlaylistsViewModel.plusProportion(proportionView.tag as Int)
-    }
-
-    fun btnProportionMinusClick(view: View){
-        val proportionView = getProportionView(view)
-        timezonePlaylistsViewModel.minusProportion(proportionView.tag as Int)
-    }
-
-    private fun getProportionView(view: View): TextView {
-        val linearLayout = (view.parent as ViewGroup).parent as LinearLayout
-        return linearLayout.findViewById(R.id.proportion)
-    }
-
     private fun inflateRecycler(){
-        main_recyclerView.adapter = RecyclerAdapter(profile.schedule, timezonePlaylistsViewModel.timezonePlaylistsData, this)
+        main_recyclerView.adapter = RecyclerAdapter(timezonePlaylistsViewModel.recyclerItems ,object: ChangeProportionCallbacks{
+
+            override fun plusProportion(position: Int) {
+                timezonePlaylistsViewModel.plusProportion(position)
+            }
+
+            override fun minusProportion(position: Int) {
+                timezonePlaylistsViewModel.minusProportion(position)
+            }
+
+        })
         main_recyclerView.layoutManager = LinearLayoutManager(this)
+        timezonePlaylistsViewModel.changedPlaylistPosition.observe(this, Observer{
+            main_recyclerView.adapter!!.notifyItemChanged(it)})
     }
 
 }

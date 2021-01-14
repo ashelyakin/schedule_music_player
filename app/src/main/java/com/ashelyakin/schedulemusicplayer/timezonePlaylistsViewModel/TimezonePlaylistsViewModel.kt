@@ -3,41 +3,53 @@ package com.ashelyakin.schedulemusicplayer.timezonePlaylistsViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.ashelyakin.schedulemusicplayer.profile.Schedule
+import com.ashelyakin.schedulemusicplayer.profile.TimeZone
 import com.ashelyakin.schedulemusicplayer.profile.TimeZonePlaylist
+import com.ashelyakin.schedulemusicplayer.recyclerView.ItemType
+import com.ashelyakin.schedulemusicplayer.util.TimezoneUtil
 
 class TimezonePlaylistsViewModel(schedule: Schedule): ViewModel() {
 
-    val timezonePlaylistsData = MutableLiveData<HashMap<Int, TimeZonePlaylist>>()
+    //список элементов для recyclerview, состоящий из списоков дней, таймзон и плейлистов, преобразованных в одномерную форму
+    val recyclerItems = ArrayList<Pair<Any, ItemType>>()
+
+    //позиция последнего плейлиста, в котором изменились пропорции
+    val changedPlaylistPosition = MutableLiveData<Int>()
 
     init {
-        timezonePlaylistsData.value = HashMap()
-        for (timezonePlaylist in schedule.days.flatMap { it.timeZones.flatMap { it.playlists } })
-        {
-            timezonePlaylistsData.value?.set(timezonePlaylist.playlistID, timezonePlaylist)
+        for (day in schedule.days){
+            recyclerItems.add(Pair(day, ItemType.DAY))
+            //сортировка списка timeZones
+            val sortTimeZones = TimezoneUtil.sortTimeZones(day.timeZones as ArrayList<TimeZone>)
+
+            for (timeZone in sortTimeZones){
+                recyclerItems.add(Pair(timeZone, ItemType.TIMEZONE))
+                for (playlist in timeZone.playlists){
+                    recyclerItems.add(Pair(playlist, ItemType.PLAYLIST))
+                }
+            }
         }
     }
 
-    fun plusProportion(id: Int){
-        setProportion(id, ProportionBtnClickType.PLUS)
+    fun plusProportion(position: Int){
+        setProportion(position, ProportionBtnClickType.PLUS)
     }
 
-    fun minusProportion(id: Int){
-        setProportion(id, ProportionBtnClickType.MINUS)
+    fun minusProportion(position: Int){
+        setProportion(position, ProportionBtnClickType.MINUS)
     }
 
     private enum class ProportionBtnClickType {
         PLUS, MINUS
     }
 
-    private fun setProportion(id: Int, type: ProportionBtnClickType){
-        val timezonePlaylist = timezonePlaylistsData.value?.get(id)
-        val currentProportion = timezonePlaylist?.proportion!!
+    private fun setProportion(position: Int, type: ProportionBtnClickType){
+        val timezonePlaylist = recyclerItems[position].first as TimeZonePlaylist
         if (type == ProportionBtnClickType.PLUS)
-            timezonePlaylist.proportion = currentProportion + 1
-        else if (currentProportion > 1)
-            timezonePlaylist.proportion = currentProportion - 1
-        val newTimezonePlaylistsData = HashMap(timezonePlaylistsData.value)
-        newTimezonePlaylistsData[id] = timezonePlaylist
-        timezonePlaylistsData.postValue(newTimezonePlaylistsData)
+            timezonePlaylist.proportion += 1
+        else if (timezonePlaylist.proportion > 1)
+            timezonePlaylist.proportion -= 1
+
+        changedPlaylistPosition.postValue(position)
     }
 }
