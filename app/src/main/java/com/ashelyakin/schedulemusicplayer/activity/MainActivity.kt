@@ -55,13 +55,17 @@ class MainActivity : AppCompatActivity() {
         downloadViewModel.downloadState.observe(this, Observer{
             when (it){
                 DownloadViewModel.DownloadState.STARTED -> loadStartDialogFragment.show(supportFragmentManager, "loadStartDialog")
-                DownloadViewModel.DownloadState.RESUMED -> inetUnavailableDialogFragment.dismiss()
+                DownloadViewModel.DownloadState.RESUMED -> {
+                    if (inetUnavailableDialogFragment.isAdded)
+                        inetUnavailableDialogFragment.dismiss()
+                }
                 DownloadViewModel.DownloadState.STOPPED -> {
                     inetUnavailableDialogFragment.isCancelable = false
                     inetUnavailableDialogFragment.show(supportFragmentManager, "inetUnavailableDialogFragment")
                 }
                 DownloadViewModel.DownloadState.FINISHED -> {
-                    loadStartDialogFragment.dismiss()
+                    if (loadStartDialogFragment.isAdded)
+                        loadStartDialogFragment.dismiss()
                     loadFinishDialogFragment.show(supportFragmentManager, "loadFinishDialog")
                     inflateRecycler()
                 }

@@ -15,17 +15,18 @@ class Downloader(private val callbacks: DownloadCallbacks) {
         GlobalScope.launch {
             callbacks.onLoadStart()
 
-            val fileList = SchedulePlaylistsData.getPlaylistsData()
-                .flatMap { it.files }
+            val fileSet = HashSet<com.ashelyakin.schedulemusicplayer.profile.File>()
+            SchedulePlaylistsData.getPlaylistsData().forEach{ fileSet.addAll(it.value.files) }
+
             var progress = 0
-            val step = 100/fileList.size
+            val step = 100/fileSet.size
 
-            for (musicFile in fileList) {
-                ifInetIsUnavailable()
-
+            for (musicFile in fileSet) {
                 val musicFileAbsolutePath = context.filesDir.absolutePath + "/" + musicFile.id + ".mp3"
-                if (!File(musicFileAbsolutePath).exists())
+                if (!File(musicFileAbsolutePath).exists()) {
+                    ifInetIsUnavailable()
                     getMp3FromURL(musicFile.fileName, musicFileAbsolutePath)
+                }
 
                 progress += step
                 callbacks.onProgressChanged(progress)
