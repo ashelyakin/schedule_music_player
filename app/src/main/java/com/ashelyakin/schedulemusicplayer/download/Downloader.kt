@@ -58,16 +58,17 @@ class Downloader(private val callbacks: DownloadCallbacks) {
     }
 
     private fun getMp3FromURL(url_path: String, fileAbsolutePath: String) {
-        try {
-            val url = URL(url_path)
-            val httpURLConnection = url.openConnection() as HttpURLConnection
-            httpURLConnection.requestMethod = "GET"
-            httpURLConnection.doOutput = false
-            httpURLConnection.connect()
+        val fos = FileOutputStream(File(fileAbsolutePath))
 
-            val file = File(fileAbsolutePath)
-            val fos = FileOutputStream(file)
-            val inputStream = httpURLConnection.inputStream
+        val url = URL(url_path)
+        val httpURLConnection = url.openConnection() as HttpURLConnection
+        httpURLConnection.requestMethod = "GET"
+        httpURLConnection.doOutput = false
+
+        val inputStream = httpURLConnection.inputStream
+        try {
+
+            httpURLConnection.connect()
 
             var downloadSize = 0
             val buffer = ByteArray(1024)
@@ -76,9 +77,12 @@ class Downloader(private val callbacks: DownloadCallbacks) {
                 fos.write(buffer, 0, bufferLength)
                 downloadSize += bufferLength
             }
+
+        } catch (e: Exception) {
+        }
+        finally {
             fos.close()
             inputStream.close()
-        } catch (e: Exception) {
         }
     }
 
