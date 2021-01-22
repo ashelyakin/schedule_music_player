@@ -11,22 +11,6 @@ import java.lang.reflect.Method;
 public class BackgroundStart {
 
     public static boolean canBackgroundStart(Context context) {
-        AppOpsManager ops = (AppOpsManager) context.getSystemService(Context.APP_OPS_SERVICE);
-        try {
-            int op = 10021; // >= 23
-            // ops.checkOpNoThrow(op, uid, packageName)
-            Method method = ops.getClass().getMethod("checkOpNoThrow", new Class[]
-                    {int.class, int.class, String.class}
-            );
-            Integer result = (Integer) method.invoke(ops, op, android.os.Process.myUid(), context.getPackageName());
-            return result == AppOpsManager.MODE_ALLOWED;
-        } catch (Exception e) {
-            Log.e("BackgroundStart", "not support", e);
-        }
-        return false;
-    }
-
-    public static boolean isAccessGranted(Context context) {
         try {
             PackageManager packageManager = context.getPackageManager();
             ApplicationInfo applicationInfo = packageManager.getApplicationInfo(context.getPackageName(), 0);

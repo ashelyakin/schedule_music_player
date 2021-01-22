@@ -27,6 +27,8 @@ class PlayerViewModel(application: Application): AndroidViewModel(application) {
     var currentPlaylist = MutableLiveData<TimeZonePlaylist>()
     var playlistsPosition = HashMap<Int, Int>()
 
+    var isPlayerInitialized = MutableLiveData<Boolean>(false)
+
     fun initPlayer(schedule: Schedule, playerCallbacks: PlayerCallbacks, changeViewTextCallbacks: ChangeViewTextCallbacks){
         Log.i(TAG, "starting player")
 
@@ -101,6 +103,7 @@ class PlayerViewModel(application: Application): AndroidViewModel(application) {
         }
         else
             timer.schedule(PlayTimerTaskManual(), nextTimeZoneDate)
+        isPlayerInitialized.postValue(true)
     }
 
     private fun scheduleStopTimerTask(stopTime: Date, nextTimeZoneDate: Date) {
