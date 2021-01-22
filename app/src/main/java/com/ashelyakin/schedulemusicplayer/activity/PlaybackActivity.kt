@@ -1,20 +1,33 @@
 package com.ashelyakin.schedulemusicplayer.activity
 
+import android.app.ActivityManager
+import android.app.ActivityManager.RecentTaskInfo
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import com.ashelyakin.schedulemusicplayer.ForegroundCallbacks
+import com.ashelyakin.schedulemusicplayer.PlayerApplication
 import com.ashelyakin.schedulemusicplayer.R
+import com.ashelyakin.schedulemusicplayer.Receiver
 import com.ashelyakin.schedulemusicplayer.player.ExoPlayerListener
 import com.ashelyakin.schedulemusicplayer.player.PlayerViewModel
 import com.ashelyakin.schedulemusicplayer.profile.Schedule
 import com.google.android.exoplayer2.MediaItem
 import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.android.synthetic.main.activity_playback.*
+
 
 class PlaybackActivity: AppCompatActivity() {
 
@@ -24,15 +37,84 @@ class PlaybackActivity: AppCompatActivity() {
 
     private lateinit var playerViewModel: PlayerViewModel
 
+    private lateinit var context: Context
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_playback)
+        context = this
+        this.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
+
+        val activityManager = context.getSystemService(ACTIVITY_SERVICE) as ActivityManager
+
+       /* val startForegroundedActivityIntent = Intent(context, MainActivity::class.java)
+        startForegroundedActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);//optional
+        startForegroundedActivityIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);//will cause it to come to foreground
+        startForegroundedActivityIntent.putExtra("ID_TimeLeft","test");
+        startActivity(startForegroundedActivityIntent)*/
+
+        //registerReceiver(Receiver(), IntentFilter("com.ashelyakin.schedulemusicplayer.START_FOREGROUND_ACTIVITY"))
+        PlayerApplication.setForegroundedActivity(object: ForegroundCallbacks{
+            override fun start() {
+                runOnUiThread {
+                    //launchApp("com.ashelyakin.schedulemusicplayer")
+                    //activityManager.moveTaskToFront(taskId, 0)
+                    /*val startForegroundedActivityIntent = packageManager.getLaunchIntentForPackage(packageName)
+                    val pStartForegroundedActivityIntent = PendingIntent.getActivity(context, 0, startForegroundedActivityIntent, 0)
+                    val am = getSystemService(ALARM_SERVICE) as AlarmManager
+                    am.set(AlarmManager.RTC, System.currentTimeMillis(), pStartForegroundedActivityIntent)*/
+                    val startForegroundedActivityIntent = Intent(context, MainActivity::class.java)
+                    startForegroundedActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);//optional
+                    startForegroundedActivityIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);//will cause it to come to foreground
+                    startForegroundedActivityIntent.putExtra("ID_TimeLeft","test");
+                    startActivity(startForegroundedActivityIntent);
+
+                }
+            }
+        })
+        //initPlayer()
+        if (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    !Settings.canDrawOverlays(this)
+
+                } else {
+                    TODO("VERSION.SDK_INT < M")
+                }) {
+            val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
+            startActivityForResult(intent, 0)
+        }
+        Log.d(TAG, "initPlayer was completed")
     }
 
+    private fun launchApp(packageName: String) {
+        val runningAppInfo = getRecentTaskInfo(packageName)
+
+        // If already running, just bring it to foreground
+        if (runningAppInfo != null) {
+            startActivity(runningAppInfo.baseIntent)
+
+            // Otherwise, start new task
+        } else {
+            startActivity(packageManager.getLaunchIntentForPackage(packageName))
+        }
+    }
+
+    private fun getRecentTaskInfo(packageName: String): RecentTaskInfo? {
+        val manager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        try {
+            // 10 : # of tasks you want to take a look at
+            val infoList = manager.getRecentTasks(10, 0)
+            for (info in infoList) {
+                if (info.baseIntent.component!!.packageName == packageName) {
+                    return info
+                }
+            }
+        } catch (e: NullPointerException) {
+        }
+        return null
+    }
     override fun onStart() {
         super.onStart()
-        initPlayer()
-        Log.d(TAG, "initPlayer was completed")
+        Log.d(TAG, "onStart()")
     }
 
     override fun onResume() {
@@ -47,13 +129,13 @@ class PlaybackActivity: AppCompatActivity() {
             findViewById<Button>(R.id.btnPlay).setBackgroundResource(R.mipmap.play)
         }
         isBtnPlayNow = !isBtnPlayNow
-        playerViewModel.pause()
+        //playerViewModel.pause()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         Log.d(TAG, "onDestroy()")
-        playerViewModel.release()
+        //playerViewModel.release()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -71,7 +153,10 @@ class PlaybackActivity: AppCompatActivity() {
 
     override fun onBackPressed() {
         super.onBackPressed()
-        finish()
+        val startMain = Intent(Intent.ACTION_MAIN)
+        startMain.addCategory(Intent.CATEGORY_HOME)
+        startMain.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(startMain)
     }
 
     inner class PlayerCallbacks: com.ashelyakin.schedulemusicplayer.player.PlayerCallbacks{
@@ -134,7 +219,6 @@ class PlaybackActivity: AppCompatActivity() {
         }
 
         val schedule: Schedule = intent.getParcelableExtra("schedule")!!
-        //val playerViewModelFactory = PlayerViewModelFactory(schedule, PlayerCallbacks(), this.viewModelStore, changeViewTextCallbacks, application)
         playerViewModel = ViewModelProvider(this).get(PlayerViewModel::class.java)
         playerViewModel.initPlayer(schedule, PlayerCallbacks(), changeViewTextCallbacks)
     }
