@@ -40,4 +40,14 @@
         android:text="Next track"
         android:onClick="btnNextTrackClick" />
 
+    <Button
+        android:id="@+id/hide"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginTop="130dp"
+        android:layout_marginEnd="10dp"
+        android:text="Hide"
+        android:onClick="btnHideClick" />
+
 </LinearLayout>

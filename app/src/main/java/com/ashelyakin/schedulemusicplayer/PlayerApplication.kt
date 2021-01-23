@@ -28,7 +28,7 @@ class PlayerApplication(): Application(), LifecycleObserver {
     fun onAppBackgrounded() {
         Log.i(TAG,"App backgrounded")
         if (isStartForegroundingOn)
-            Timer().schedule(StartForegroundedActivity(this), delayMillis)
+            Timer().schedule(StartForegroundedActivity(this), 500)
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)

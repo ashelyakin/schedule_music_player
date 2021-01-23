@@ -24,6 +24,7 @@ import com.ashelyakin.schedulemusicplayer.profile.Schedule
 import com.google.android.exoplayer2.MediaItem
 import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.android.synthetic.main.activity_playback.*
+import java.util.*
 
 
 class PlaybackActivity: AppCompatActivity() {
@@ -169,6 +170,14 @@ class PlaybackActivity: AppCompatActivity() {
                         val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
                         intent.data = Uri.parse("package:$packageName")
                         startActivityForResult(intent, 0)
+
+                        if ("xiaomi" == Build.MANUFACTURER.toLowerCase(Locale.ROOT)) {
+                            val intent = Intent("miui.intent.action.APP_PERM_EDITOR")
+                            intent.setClassName("com.miui.securitycenter",
+                                    "com.miui.permcenter.permissions.PermissionsEditorActivity")
+                            intent.putExtra("extra_pkgname", getPackageName())
+                            startActivity(intent)
+                        }
                     }
                 }
             }
@@ -201,6 +210,10 @@ class PlaybackActivity: AppCompatActivity() {
 
     fun btnNextTrackClick(v: View) {
         playerViewModel.next()
+    }
+
+    fun btnHideClick(view: View) {
+        moveTaskToBack(true)
     }
 
 }
