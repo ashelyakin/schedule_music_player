@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.ACTION_MANAGE_OVERLAY_PERMISSION" />
     <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS"
         tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
 
     <application
         android:allowBackup="true"
@@ -19,7 +20,8 @@
         android:theme="@style/Theme.ScheduleMusicPlayer">
 
         <activity android:name="com.ashelyakin.schedulemusicplayer.activity.PlaybackActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:launchMode="singleTask"/>
 
 
         <activity android:name="com.ashelyakin.schedulemusicplayer.activity.MainActivity"

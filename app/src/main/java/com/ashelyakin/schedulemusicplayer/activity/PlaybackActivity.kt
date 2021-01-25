@@ -11,10 +11,9 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.ashelyakin.schedulemusicplayer.BackgroundStart
+import com.ashelyakin.schedulemusicplayer.BackgroundStartUtil
 import com.ashelyakin.schedulemusicplayer.PermissionsIntentCallbacks
 import com.ashelyakin.schedulemusicplayer.PlayerApplication
 import com.ashelyakin.schedulemusicplayer.R
@@ -38,21 +37,23 @@ class PlaybackActivity: AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_playback)
-        //this.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
         initPlayer()
-        playerViewModel.isPlayerInitialized.observe(this, Observer{
-            if (it){
-                startForegrounding()
-            }
-        })
+
         Log.d(TAG, "initPlayer was completed")
     }
-
-
 
     override fun onStart() {
         super.onStart()
         Log.d(TAG, "onStart()")
+        if (playerViewModel.isPlayerInitialized.value == true)
+            startForegrounding()
+        else {
+            playerViewModel.isPlayerInitialized.observe(this, Observer {
+                if (it) {
+                    startForegrounding()
+                }
+            })
+        }
     }
 
     override fun onResume() {
@@ -63,17 +64,21 @@ class PlaybackActivity: AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         Log.d(TAG, "onPause()")
-        if (!isBtnPlayNow) {
-            findViewById<Button>(R.id.btnPlay).setBackgroundResource(R.mipmap.play)
+        if (playerViewModel.isPlayerInitialized.value == true) {
+            if (!isBtnPlayNow) {
+                findViewById<Button>(R.id.btnPlay).setBackgroundResource(R.mipmap.play)
+            }
+            isBtnPlayNow = !isBtnPlayNow
+            playerViewModel.pause()
         }
-        isBtnPlayNow = !isBtnPlayNow
-        playerViewModel.pause()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         Log.d(TAG, "onDestroy()")
-        playerViewModel.release()
+        if (playerViewModel.isPlayerInitialized.value == true) {
+            playerViewModel.release()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -91,10 +96,6 @@ class PlaybackActivity: AppCompatActivity() {
 
     override fun onBackPressed() {
         super.onBackPressed()
-        /*val startMain = Intent(Intent.ACTION_MAIN)
-        startMain.addCategory(Intent.CATEGORY_HOME)
-        startMain.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        startActivity(startMain)*/
         finish()
     }
 
@@ -157,9 +158,10 @@ class PlaybackActivity: AppCompatActivity() {
             }
         }
 
-        val schedule: Schedule = intent.getParcelableExtra("schedule")!!
+        val schedule: Schedule? = intent.getParcelableExtra("schedule")
         playerViewModel = ViewModelProvider(this).get(PlayerViewModel::class.java)
-        playerViewModel.initPlayer(schedule, PlayerCallbacks(), changeViewTextCallbacks)
+        if (schedule != null)
+            playerViewModel.initPlayer(schedule, PlayerCallbacks(), changeViewTextCallbacks)
     }
 
     private fun startForegrounding(){
@@ -175,7 +177,7 @@ class PlaybackActivity: AppCompatActivity() {
                             val intent = Intent("miui.intent.action.APP_PERM_EDITOR")
                             intent.setClassName("com.miui.securitycenter",
                                     "com.miui.permcenter.permissions.PermissionsEditorActivity")
-                            intent.putExtra("extra_pkgname", getPackageName())
+                            intent.putExtra("extra_pkgname", packageName)
                             startActivity(intent)
                         }
                     }
@@ -184,14 +186,14 @@ class PlaybackActivity: AppCompatActivity() {
 
             override fun backgroundStart() {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    if (!BackgroundStart.canBackgroundStart(this@PlaybackActivity)) {
+                    if (!BackgroundStartUtil.canBackgroundStart(this@PlaybackActivity)) {
                         val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
                         startActivity(intent)
                     }
                 }
             }
 
-        })
+        }, Pair("schedule", playerViewModel.schedule))
     }
 
     fun btnPlayClick(v: View) {
@@ -213,6 +215,7 @@ class PlaybackActivity: AppCompatActivity() {
     }
 
     fun btnHideClick(view: View) {
+        PlayerApplication.stopForegrounding()
         moveTaskToBack(true)
     }
 
