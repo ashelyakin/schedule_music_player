@@ -29,31 +29,24 @@ class PlayerApplication(): Application(), LifecycleObserver {
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     fun onAppBackgrounded() {
         Log.i(TAG,"App backgrounded")
-        if (isStartForegroundingOn && isAppInBackground()) {
-            val startForegroundedActivityIntent = Intent(applicationContext, foregroundedActivity)
-            startForegroundedActivityIntent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
-            startForegroundedActivityIntent.putExtra(extraForIntent.first, extraForIntent.second)
-            val startForegroundedActivityPendingIntent = PendingIntent.getActivity(applicationContext, 0, startForegroundedActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-            val am = applicationContext.getSystemService(AppCompatActivity.ALARM_SERVICE) as AlarmManager
-            am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+ delayMillisForForegrounding, startForegroundedActivityPendingIntent)
-        }
+        startService(Intent(this, ForegroundingService::class.java))
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onAppForegrounded() {
         Log.i(TAG,"App foregrounded")
     }
-    
+
     companion object{
 
         private const val defaultDelayMillisForForegrounding: Long = 5000
 
-        private lateinit var foregroundedActivity: Class<*>
+        lateinit var foregroundedActivity: Class<*>
         private lateinit var permissionsIntentCallbacks: PermissionsIntentCallbacks
-        private var delayMillisForForegrounding = defaultDelayMillisForForegrounding
-        private lateinit var extraForIntent: Pair<String, Parcelable>
+        var delayMillisForForegrounding = defaultDelayMillisForForegrounding
+        lateinit var extraForIntent: Pair<String, Parcelable>
 
-        private var isStartForegroundingOn = false
+        var isStartForegroundingOn = false
 
         private var countStartedActivities = 0
 
