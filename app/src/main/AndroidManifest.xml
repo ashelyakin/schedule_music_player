@@ -9,6 +9,7 @@
     <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS"
         tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
 
     <application
         android:allowBackup="true"
@@ -36,7 +37,9 @@
 
         <service
             android:enabled="true"
-            android:name=".ForegroundingService">
+            android:name=".ForegroundingService"
+            android:exported="true"
+            android:process=":ServiceProcess">
         </service>
 
     </application>

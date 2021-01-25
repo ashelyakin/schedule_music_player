@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.AlarmManager
 import android.app.Application
 import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
@@ -22,6 +23,7 @@ class PlayerApplication(): Application(), LifecycleObserver {
 
     override fun onCreate() {
         super.onCreate()
+        context = applicationContext
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
         registerActivityLifecycleCallbacks(ActivityLifecycleCallbacksManager())
     }
@@ -29,7 +31,8 @@ class PlayerApplication(): Application(), LifecycleObserver {
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     fun onAppBackgrounded() {
         Log.i(TAG,"App backgrounded")
-        startService(Intent(this, ForegroundingService::class.java))
+        if (isStartForegroundingOn)
+            startService(Intent(this, ForegroundingService::class.java))
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
@@ -38,6 +41,8 @@ class PlayerApplication(): Application(), LifecycleObserver {
     }
 
     companion object{
+
+        private lateinit var context: Context
 
         private const val defaultDelayMillisForForegrounding: Long = 5000
 
