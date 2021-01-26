@@ -37,9 +37,7 @@
 
         <service
             android:enabled="true"
-            android:name=".ForegroundingService"
-            android:exported="true"
-            android:process=":ServiceProcess">
+            android:name=".ForegroundingService">
         </service>
 
     </application>

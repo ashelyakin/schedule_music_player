@@ -46,11 +46,11 @@ class PlaybackActivity: AppCompatActivity() {
         super.onStart()
         Log.d(TAG, "onStart()")
         if (playerViewModel.isPlayerInitialized.value == true)
-            startForegrounding()
+            initAndStartForegrounding()
         else {
             playerViewModel.isPlayerInitialized.observe(this, Observer {
                 if (it) {
-                    startForegrounding()
+                    initAndStartForegrounding()
                 }
             })
         }
@@ -79,6 +79,7 @@ class PlaybackActivity: AppCompatActivity() {
         if (playerViewModel.isPlayerInitialized.value == true) {
             playerViewModel.release()
         }
+        stopForegroundingServiceAndFinish()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -89,13 +90,18 @@ class PlaybackActivity: AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId){
-            android.R.id.home -> finish()
+            android.R.id.home -> stopForegroundingServiceAndFinish()
         }
         return super.onOptionsItemSelected(item)
     }
 
     override fun onBackPressed() {
         super.onBackPressed()
+        stopForegroundingServiceAndFinish()
+    }
+
+    private fun stopForegroundingServiceAndFinish(){
+        PlayerApplication.stopForegrounding()
         finish()
     }
 
@@ -164,8 +170,8 @@ class PlaybackActivity: AppCompatActivity() {
             playerViewModel.initPlayer(schedule, PlayerCallbacks(), changeViewTextCallbacks)
     }
 
-    private fun startForegrounding(){
-        PlayerApplication.startForegrounding(PlaybackActivity::class.java, object: PermissionsIntentCallbacks{
+    private fun initAndStartForegrounding(){
+        PlayerApplication.initForegrounding(this, object: PermissionsIntentCallbacks{
             override fun drawOverlays() {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     if (!Settings.canDrawOverlays(this@PlaybackActivity)) {
@@ -183,7 +189,6 @@ class PlaybackActivity: AppCompatActivity() {
                     }
                 }
             }
-
             override fun backgroundStart() {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     if (!BackgroundStartUtil.canBackgroundStart(this@PlaybackActivity)) {
@@ -194,6 +199,7 @@ class PlaybackActivity: AppCompatActivity() {
             }
 
         }, Pair("schedule", playerViewModel.schedule))
+        PlayerApplication.startForegrounding()
     }
 
     fun btnPlayClick(v: View) {
