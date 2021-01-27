@@ -38,19 +38,19 @@ class PlaybackActivity: AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_playback)
         initPlayer()
-
-        Log.d(TAG, "initPlayer was completed")
+        initForegrounding()
+        Log.d(TAG, "init player was completed")
     }
 
     override fun onStart() {
         super.onStart()
         Log.d(TAG, "onStart()")
         if (playerViewModel.isPlayerInitialized.value == true)
-            initAndStartForegrounding()
+            PlayerApplication.startForegrounding()
         else {
             playerViewModel.isPlayerInitialized.observe(this, Observer {
                 if (it) {
-                    initAndStartForegrounding()
+                    PlayerApplication.startForegrounding()
                 }
             })
         }
@@ -170,7 +170,7 @@ class PlaybackActivity: AppCompatActivity() {
             playerViewModel.initPlayer(schedule, PlayerCallbacks(), changeViewTextCallbacks)
     }
 
-    private fun initAndStartForegrounding(){
+    private fun initForegrounding(){
         PlayerApplication.initForegrounding(this, object: PermissionsIntentCallbacks{
             override fun drawOverlays() {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -199,7 +199,6 @@ class PlaybackActivity: AppCompatActivity() {
             }
 
         }, Pair("schedule", playerViewModel.schedule))
-        PlayerApplication.startForegrounding()
     }
 
     fun btnPlayClick(v: View) {

@@ -60,8 +60,7 @@ class ForegroundingService: Service() {
                 startForegroundedActivityIntent.putExtra(PlayerApplication.extraForIntent.first, PlayerApplication.extraForIntent.second)
                 PlayerApplication.foregroundedActivity.startActivity(startForegroundedActivityIntent)
             }
+            stopSelf()
         }
-
     }
-
 }

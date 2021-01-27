@@ -8,7 +8,7 @@ import android.os.Parcelable
 import android.util.Log
 
 
-class PlayerApplication(): Application() {
+class PlayerApplication: Application() {
 
     override fun onCreate() {
         super.onCreate()
@@ -20,7 +20,6 @@ class PlayerApplication(): Application() {
         private const val defaultDelayMillisForForegrounding: Long = 3000
 
         lateinit var foregroundedActivity: Activity
-        private lateinit var permissionsIntentCallbacks: PermissionsIntentCallbacks
         var delayMillisForForegrounding = defaultDelayMillisForForegrounding
         lateinit var extraForIntent: Pair<String, Parcelable>
 
@@ -31,12 +30,11 @@ class PlayerApplication(): Application() {
 
         fun initForegrounding(foregroundedActivity: Activity, permissionsIntentCallbacks: PermissionsIntentCallbacks, extraForIntent: Pair<String, Parcelable>, delayMillis: Long = defaultDelayMillisForForegrounding){
             this.foregroundedActivity = foregroundedActivity
-            this.permissionsIntentCallbacks = permissionsIntentCallbacks
             this.delayMillisForForegrounding = delayMillis
             this.extraForIntent = extraForIntent
 
-            Companion.permissionsIntentCallbacks.drawOverlays()
-            Companion.permissionsIntentCallbacks.backgroundStart()
+            permissionsIntentCallbacks.drawOverlays()
+            permissionsIntentCallbacks.backgroundStart()
         }
 
         fun startForegrounding(){
@@ -56,8 +54,6 @@ class PlayerApplication(): Application() {
 
         override fun onActivityStarted(activity: Activity) {
             ++countStartedActivities
-            if (isStartForegroundingOn && activity == foregroundedActivity)
-                stopService(Intent(baseContext, ForegroundingService::class.java))
         }
 
         override fun onActivityDestroyed(activity: Activity) {}
@@ -66,8 +62,9 @@ class PlayerApplication(): Application() {
 
         override fun onActivityStopped(activity: Activity) {
             --countStartedActivities
-            if (isStartForegroundingOn &&  activity == foregroundedActivity)
+            if (isStartForegroundingOn &&  activity == foregroundedActivity){
                 startService(Intent(baseContext, ForegroundingService::class.java))
+            }
         }
 
         override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}
